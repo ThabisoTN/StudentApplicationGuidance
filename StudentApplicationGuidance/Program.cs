@@ -1,6 +1,14 @@
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using StudentApplicationGuidance.Data;
+using StudentApplicationGuidance.Models;
+using StudentApplicationGuidance.Services;
+using System;
 
 namespace StudentApplicationGuidance
 {
@@ -10,34 +18,33 @@ namespace StudentApplicationGuidance
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            // Configuration
+            builder.Configuration.AddJsonFile("appsettings.json");
+
+            // Database configuration
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+            // Identity configuration
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
             })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            // Add SubjectServices to DI container
+            builder.Services.AddScoped<SubjectService>(); // Example for SubjectServices
+            builder.Services.AddScoped<UserSubjectService>(); // Example for UserSubjectService
+
+            // Controllers and Views configuration
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseMigrationsEndPoint();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
-
-            // Seed the database
+            // Database seeding
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -53,16 +60,29 @@ namespace StudentApplicationGuidance
                 }
             }
 
+            // HTTP request pipeline configuration
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseMigrationsEndPoint(); // Enable database management endpoint in development
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error"); // Error handling middleware in production
+                app.UseHsts(); // HTTP Strict Transport Security (HSTS) for enhanced security
+            }
+
+            // Middleware for HTTPS redirection, static files, routing, and authorization
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
+            // Default routing configuration
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Subject}/{action=SelectSubjects}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            // Razor Pages configuration
             app.MapRazorPages();
 
             app.Run();

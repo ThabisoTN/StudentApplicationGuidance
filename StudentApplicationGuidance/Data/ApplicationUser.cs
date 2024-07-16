@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using ZizoAI.Models;
+using StudentApplicationGuidance.Models;
 
 namespace StudentApplicationGuidance.Data
 {

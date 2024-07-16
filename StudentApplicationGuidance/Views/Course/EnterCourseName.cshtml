@@ -1,0 +1,78 @@
+﻿@model StudentApplicationGuidance.ModelView.EnterCourseViewModel
+
+
+<h3>Select Course/program to check if you qualify for that program/course</h3>
+<form asp-action="EnterCourseName" method="post">
+    <select asp-for="CourseName" class="custom-select">
+        <option value="">Select a course</option>
+        @foreach (var course in Model.CourseRequirements)
+        {
+            <option value="@course.Key">@course.Key</option>
+        }
+    </select>
+    <button type="submit" class="submit-button" disabled="@Model.IsLoading">
+        @(Model.IsLoading ? "Checking..." : "Submit")
+    </button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="message-box @(Model.IsEligible ? "success" : "error")">
+        @Model.Message
+    </div>
+}
+
+<style>
+    .custom-select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-top: 6px;
+        margin-bottom: 16px;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .submit-button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 12px;
+        transition-duration: 0.4s;
+    }
+
+        .submit-button:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+    .message-box {
+        margin-top: 16px;
+        padding: 15px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 16px;
+        width: 100%;
+    }
+
+        .message-box.success {
+            border: 1px solid #d4edda;
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message-box.error {
+            border: 1px solid #f8d7da;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+</style>
+

@@ -1,0 +1,229 @@
+﻿@page "/EnterCourseName"
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using StudentApplicationGuidance.Data
+@using StudentApplicationGuidance.Services
+@using Microsoft.AspNetCore.Http
+@using Microsoft.JSInterop
+@* @rendermode InteractiveServer *@
+@attribute [StreamRendering]
+
+<h3>Select Course/program to check if you qualify for that program/course</h3>
+<select @bind="courseName" class="custom-select">
+    <option value="">Select a course</option>
+    @foreach (var course in courseRequirements)
+    {
+        <option value="@course.Key">@course.Key</option>
+    }
+</select>
+<button class="submit-button" @onclick="SubmitCourse" disabled="@isLoading">
+    @(isLoading ? "Checking..." : "Submit")
+</button>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="message-box @(isEligible ? "success" : "error")">
+        @message
+    </div>
+}
+
+<style>
+    .custom-select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-top: 6px;
+        margin-bottom: 16px;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .submit-button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 12px;
+        transition-duration: 0.4s;
+    }
+
+        .submit-button:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+    .message-box {
+        margin-top: 16px;
+        padding: 15px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 16px;
+        width: 100%;
+    }
+
+        .message-box.success {
+            border: 1px solid #d4edda;
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message-box.error {
+            border: 1px solid #f8d7da;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+</style>
+
+@code {
+    private string courseName;
+    private bool isLoading = false;
+    private string message;
+    private bool isEligible;
+    private ApplicationUser user;
+
+    [Inject] private ApplicationDbContext _context { get; set; }
+    [Inject] private UserManager<ApplicationUser> UserManager { get; set; }
+    [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; }
+
+    //Course dictionary
+    private Dictionary<string, Dictionary<string, int[]>> courseRequirements = new Dictionary<string, Dictionary<string, int[]>>
+    {
+        {
+            "BSc Computer Science & Information Technology",
+            new Dictionary<string, int[]>
+            {
+                { "Mathematics", new int[] { 5 } },
+                { "English Home Language", new int[] { 4 } },
+                { "Life Orientation", new int[] { 4 } },
+                { "Agricultural Science", new int[] { 4 } },
+                { "Life Science", new int[] { 4 } },
+                { "Physical Science", new int[] { 4 } }
+            }
+        },
+        {
+            "Bachelor of Information and Communications Technology (ICT)",
+            new Dictionary<string, int[]>
+            {
+                { "Mathematics", new int[] { 4 } },
+                { "English Home Language", new int[] { 4 } },
+            }
+        },
+        {
+            "Bachelor of Information and Communications Technology in Internet of Things (IoT)",
+            new Dictionary<string, int[]>
+            {
+                { "Mathematics", new int[] { 4 } },
+                { "English Home Language", new int[] { 4 } },
+            }
+        },
+        {
+            "Diploma in Information and Communication Technology (ICT): Applications Development",
+            new Dictionary<string, int[]>
+            {
+                { "English Home Language", new int[] { 3, 4 } },
+                { "Mathematics", new int[] { 3, 6 } },
+            }
+        },
+    };
+
+
+    //submit button
+    private async Task SubmitCourse()
+    {
+        if (string.IsNullOrWhiteSpace(courseName))
+        {
+            message = "Please select a course from the dropdown menu.";
+            isEligible = false;
+            return;
+        }
+
+        isLoading = true;
+
+        var userId = UserManager.GetUserId(HttpContextAccessor.HttpContext.User);
+        var (eligible, reason) = await CheckCourseEligibility(courseName, userId);
+
+        if (eligible)
+        {
+            message = $"Congratulations! You are eligible for the {courseName} program..";
+            isEligible = true;
+        }
+        else
+        {
+            message = $"Sorry, you do not meet the requirements for the {courseName} program. Details: {reason}";
+            isEligible = false;
+        }
+
+        isLoading = false;
+    }
+
+
+    //Retrieving user subject and level from the database
+    private async Task<Dictionary<string, int>> GetUserSubjectsAndLevels(string userId)
+    {
+        var userSubjects = await _context.UserSubjects
+                                         .Where(us => us.User.Id == userId)
+                                         .Include(us => us.Subject)
+                                         .ToListAsync();
+
+        var subjectLevels = new Dictionary<string, int>();
+
+        foreach (var userSubject in userSubjects)
+        {
+            if (userSubject.Subject != null)
+            {
+                subjectLevels[userSubject.Subject.Name] = userSubject.Level;
+            }
+        }
+
+        return subjectLevels;
+    }
+
+
+    //Checking if user is eligible for course by checking if user has the required subject and checking their levels
+    private async Task<(bool isEligible, string reason)> CheckCourseEligibility(string selectedCourse, string userId)
+    {
+        if (!courseRequirements.TryGetValue(selectedCourse, out var courseRequirement))
+        {
+            return (false, $"Course requirements not found for {selectedCourse}.");
+        }
+
+        var userSubjectsAndLevels = await GetUserSubjectsAndLevels(userId);
+        var unmetRequirements = new List<string>();
+
+        foreach (var requirement in courseRequirement)
+        {
+            string subjectName = requirement.Key;
+            int[] requiredLevels = requirement.Value;
+
+            if (!userSubjectsAndLevels.ContainsKey(subjectName))
+            {
+                unmetRequirements.Add($"You do not have the required subject: {subjectName}");
+                continue;
+            }
+
+            int userLevel = userSubjectsAndLevels[subjectName];
+            bool meetsRequirement = requiredLevels.Any(level => userLevel >= level);
+
+            if (!meetsRequirement)
+            {
+                unmetRequirements.Add($"You do not meet minimum requirement level in {subjectName}: required {string.Join(" or ", requiredLevels)}, but you got {userLevel}");
+            }
+        }
+
+        if (unmetRequirements.Any())
+        {
+            return (false, string.Join("; ", unmetRequirements));
+        }
+
+        return (true, "User meets all requirements.");
+    }
+}

@@ -1,27 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ZizoAI.Models; // Ensure this using directive is present for UserSubject
+using StudentApplicationGuidance.Models; 
 
 namespace StudentApplicationGuidance.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
+
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
 
         public DbSet<Subject> Subjects { get; set; }
-        public DbSet<UserSubject> UserSubjects { get; set; } // Ensure DbSet for UserSubject is declared
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+        public DbSet<UserSubject> UserSubjects { get; set; }
 
-            // Configure relationships or constraints if needed
-            // Example:
-            // modelBuilder.Entity<UserSubject>()
-            //     .HasKey(us => new { us.SubjectId, us.UserId });
-        }
+
     }
 }

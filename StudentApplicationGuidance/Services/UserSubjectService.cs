@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ZizoAI.Models;
+using StudentApplicationGuidance.ModelView;
+using StudentApplicationGuidance.Models;
 
 namespace StudentApplicationGuidance.Services
 {
@@ -20,14 +17,12 @@ namespace StudentApplicationGuidance.Services
             _userManager = userManager;
         }
 
-        // Retrieve all subjects asynchronously
-        public async Task<List<Subject>> GetAllSubjectsAsync()
+        public async Task<List<Subject>> GetAllSubjects()
         {
             return await _context.Subjects.ToListAsync();
         }
 
-        // Add subjects to a user with specified level
-        public async Task AddUserSubjectsAsync(string userId, List<int> subjectIds, int level)
+        public async Task AddUserSubjectsAsync(string userId, List<int> subjectIds, List<int> levels)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -35,53 +30,50 @@ namespace StudentApplicationGuidance.Services
                 throw new Exception("User not found");
             }
 
-            var userSubjects = subjectIds.Select(subjectId => new UserSubject
+            var userSubjects = subjectIds.Select((id, index) => new UserSubject
             {
-                SubjectId = subjectId,
-                User = user,
-                Level = level
+                UserId = userId,
+                SubjectId = id,
+                Level = levels[index]
             }).ToList();
 
             _context.UserSubjects.AddRange(userSubjects);
             await _context.SaveChangesAsync();
         }
 
-        // Add user subjects with a default level
-        public async Task AddUserSubjectsWithDefaultLevelAsync(string userId, List<int> subjectIds)
-        {
-            await AddUserSubjectsAsync(userId, subjectIds, 1); // Assuming default level is 1
-        }
 
-        // Calculate total points for a user based on selected subjects
-        public async Task<int> CalculatePointsAsync(string userId)
+        public async Task<int> CalculatePoints(string userId)
         {
             var userSubjects = await _context.UserSubjects
-                                             .Where(us => us.User.Id == userId)
+                                             .Where(us => us.UserId == userId)
                                              .Include(us => us.Subject)
                                              .ToListAsync();
 
-            int totalPoints = 0;
-            foreach (var item in userSubjects)
-            {
-                if (item.Level > 1 && item.Subject.Name != "Life Orientation")
-                {
-                    totalPoints += item.Level;
-                }
-            }
+            int totalPoints = userSubjects
+                .Where(us => us.Level > 1 && us.Subject.Name != "Life Orientation")
+                .Sum(us => us.Level);
 
             return totalPoints;
         }
 
-        // Retrieve user subjects with related subject and user details
-        public async Task<List<UserSubject>> GetUserSubjectsAsync(string userId)
+        public async Task<List<UserSubjectView>> GetUserSubjects(string userId)
         {
             var userSubjects = await _context.UserSubjects
-                                             .Where(us => us.User.Id == userId)
-                                             .Include(us => us.Subject)
-                                             .Include(us => us.User)
-                                             .ToListAsync();
+                                     .Where(us => us.UserId == userId)
+                                     .Include(us => us.Subject)
+                                     .ToListAsync();
 
-            return userSubjects;
+            var userSubjectViews = userSubjects.Select(us => new UserSubjectView
+            {
+                UserSubjectId = us.Id,
+                SubjectId = us.Subject.Id,
+                SubjectName = us.Subject.Name,
+                UserId = us.UserId,
+                UserName = us.User.UserName, // Assuming `UserName` is the desired property
+                Level = us.Level
+            }).ToList();
+
+            return userSubjectViews;
         }
     }
 }

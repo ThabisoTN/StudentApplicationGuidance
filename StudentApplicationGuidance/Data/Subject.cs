@@ -1,5 +1,5 @@
-﻿using ZizoAI.Models;
-
+﻿using StudentApplicationGuidance.Data;
+using StudentApplicationGuidance.Models;
 namespace StudentApplicationGuidance.Data
 {
     public class Subject
@@ -8,6 +8,5 @@ namespace StudentApplicationGuidance.Data
 
         public string Name { get; set; }
         public virtual ICollection<UserSubject> UserSubjects { get; set; }
-
     }
 }

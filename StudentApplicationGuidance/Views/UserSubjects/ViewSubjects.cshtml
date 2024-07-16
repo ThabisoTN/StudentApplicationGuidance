@@ -1,0 +1,41 @@
+﻿@model List<StudentApplicationGuidance.Models.UserSubject>
+
+@{
+    ViewData["Title"] = "User Subjects";
+}
+
+<h1>User Subjects and Levels</h1>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Level</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var userSubject in Model)
+            {
+                <tr>
+                    <td>@userSubject.Subject.Name</td>
+                    <td>@userSubject.Level</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No subjects found for the current user.</p>
+}
+
+@* <a asp-page="/Course/EnterCourseName">Go Check Course Eligibility</a> *@
+<a class="btn btn-success" asp-area="" asp-controller="Course" asp-action="EnterCourseName">Go Check Course Eligibility</a>
+
+
+<footer>
+    <hr />
+    <p>© @DateTime.Now.Year - StudentApplicationGuidance - Privacy</p>
+</footer>

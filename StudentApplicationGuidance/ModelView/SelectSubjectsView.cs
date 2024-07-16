@@ -1,4 +1,6 @@
-﻿namespace StudentApplicationGuidance.ModelView
+﻿using StudentApplicationGuidance.Data;
+
+namespace StudentApplicationGuidance.ModelView
 {
     public class SelectSubjectsView
     {
@@ -26,5 +28,7 @@
         public int Subject6Level { get; set; }
 
         public int Subject7Level { get; set; }
+
+
     }
 }
