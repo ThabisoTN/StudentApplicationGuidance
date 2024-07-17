@@ -7,22 +7,15 @@ namespace StudentApplicationGuidance.Data
 {
     public class ApplicationUser : IdentityUser
     {
-        [Required]
-        [StringLength(50, ErrorMessage = "Max 50 characters allowed")]
         public string FirstName { get; set; }
-
-        [Required]
-        [StringLength(50, ErrorMessage = "Max 50 characters allowed")]
         public string LastName { get; set; }
+        public int ProvinceId { get; set; }
+        public int FundingSourceId { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "Max 50 characters allowed")]
-        public string Province { get; set; }
+        // Navigation properties
+        public virtual Province Province { get; set; }
+        public virtual FundingSource FundingSource { get; set; }
+        //public virtual ICollection<UserSubject> UserSubjects { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "Max 50 characters allowed")]
-        public string SourceOfFunding { get; set; }
-
-        public virtual ICollection<UserSubject> UserSubjects { get; set; }
     }
 }

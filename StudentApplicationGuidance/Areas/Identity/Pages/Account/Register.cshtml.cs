@@ -16,7 +16,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StudentApplicationGuidance.Data;
 
@@ -30,13 +32,17 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
-            UserManager<ApplicationUser> userManager,
-            IUserStore<ApplicationUser> userStore,
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+        UserManager<ApplicationUser> userManager,
+        IUserStore<ApplicationUser> userStore,
+        SignInManager<ApplicationUser> signInManager,
+        ILogger<RegisterModel> logger,
+        IEmailSender emailSender,
+
+        ApplicationDbContext context)
+
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,7 +50,11 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
+
         }
+
+        
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -69,6 +79,11 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
+        /// 
+
+        public List<SelectListItem> ProvinceOptions { get; set; }
+        public List<SelectListItem> FundingSourceOptions { get; set; }
+
         public class InputModel
         {
 
@@ -83,13 +98,12 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
             public string LastName { get; set; }
 
             [Required]
-            [StringLength(50)]
-            public string Province { get; set; }
+            [Display(Name = "Province")]
+            public int ProvinceId { get; set; }
 
             [Required]
-            [StringLength(50)]
             [Display(Name = "Source of Funding")]
-            public string SourceOfFunding { get; set; }
+            public int FundingSourceId { get; set; }
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -124,6 +138,15 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
         {
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            ProvinceOptions = await _context.Provinces
+                  .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name })
+                  .ToListAsync();
+
+            FundingSourceOptions = await _context.FundingSources
+                .Select(f => new SelectListItem { Value = f.Id.ToString(), Text = f.Name })
+                .ToListAsync();
+
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
@@ -140,11 +163,10 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
                 // Set the custom properties
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-                user.Province = Input.Province;
-                user.SourceOfFunding = Input.SourceOfFunding;
+                user.ProvinceId = Input.ProvinceId;
+                user.FundingSourceId = Input.FundingSourceId;
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
-
 
 
                 if (result.Succeeded)
@@ -180,20 +202,19 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
             }
 
             // If we got this far, something failed, redisplay form
+            await OnGetAsync();
             return Page();
         }
 
         private ApplicationUser CreateUser()
         {
             try
-            {
-                var user = Activator.CreateInstance<ApplicationUser>();
-                // Set the custom properties here as well
-                user.FirstName = Input.FirstName;
-                user.LastName = Input.LastName;
-                user.Province = Input.Province;
-                user.SourceOfFunding = Input.SourceOfFunding;
-                return user;
+            {var user = Activator.CreateInstance<ApplicationUser>();
+        user.FirstName = Input.FirstName;
+        user.LastName = Input.LastName;
+        user.ProvinceId = Input.ProvinceId;  // Set ProvinceId
+        user.FundingSourceId = Input.FundingSourceId;  // Set FundingSourceId
+        return user;
                 
             }
             catch

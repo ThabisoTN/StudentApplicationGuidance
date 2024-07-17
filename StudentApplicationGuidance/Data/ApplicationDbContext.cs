@@ -16,5 +16,7 @@ namespace StudentApplicationGuidance.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<SubjectRequired> SubjectRequireds { get; set; }
         public DbSet<AlternativeSubject> AlternativeSubjects { get; set; }
+        public DbSet<Province> Provinces { get; set; }
+        public DbSet<FundingSource> FundingSources { get; set; }
     }
 }

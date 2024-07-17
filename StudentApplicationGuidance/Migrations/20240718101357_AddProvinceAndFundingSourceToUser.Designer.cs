@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentApplicationGuidance.Data;
 
@@ -11,9 +12,11 @@ using StudentApplicationGuidance.Data;
 namespace StudentApplicationGuidance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240718101357_AddProvinceAndFundingSourceToUser")]
+    partial class AddProvinceAndFundingSourceToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -533,11 +536,6 @@ namespace StudentApplicationGuidance.Migrations
 
                     b.Navigation("SubjectRequired");
 
-                    b.Navigation("UserSubjects");
-                });
-
-            modelBuilder.Entity("StudentApplicationGuidance.Models.Course", b =>
-                {
                     b.Navigation("UserSubjects");
                 });
 

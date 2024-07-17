@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Models;
 using System.Linq;
 
@@ -34,7 +35,12 @@ namespace StudentApplicationGuidance.Data
             {
                 SeedAlternativeSubjects(context);
             }
-        }
+
+            // Seed provinces if the Provinces table is empty
+            if (!context.Provinces.Any())
+            {
+                SeedProvinces(context);
+            }
 
         private static void SeedSubjects(ApplicationDbContext context)
         {
@@ -72,56 +78,6 @@ namespace StudentApplicationGuidance.Data
             };
 
             context.Subjects.AddRange(listofSubjects);
-            context.SaveChanges();
-        }
-
-        private static void SeedCourses(ApplicationDbContext context)
-        {
-            var courses = new Course[]
-            {
-                new Course { University = "UKZN", CourseName = "B Sc Computer Science & Information Technology", Points = 34 },
-                new Course { University = "DUT", CourseName = "Bachelor of Information and Communications Technology", Points = 30 },
-                new Course { University = "MUT", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },
-                new Course { University = "MUT", CourseName = "Advanced Diploma in Information Technology", Points = 25 }
-            };
-
-            context.Courses.AddRange(courses);
-            context.SaveChanges();
-        }
-
-        private static void SeedSubjectRequired(ApplicationDbContext context)
-        {
-            var subjectRequired = new SubjectRequired[]
-            {
-                new SubjectRequired { SubjectId = 1, CourseId = 1, SubjectLevel = 5 },
-                new SubjectRequired { SubjectId = 6, CourseId = 1, SubjectLevel = 5 },
-                new SubjectRequired { SubjectId = 10, CourseId = 1, SubjectLevel = 5 },
-                new SubjectRequired { SubjectId = 1, CourseId = 2, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 6, CourseId = 2, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 10, CourseId = 2, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 1, CourseId = 3, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 6, CourseId = 3, SubjectLevel = 3 },
-                new SubjectRequired { SubjectId = 10, CourseId = 3, SubjectLevel = 3 },
-                new SubjectRequired { SubjectId = 1, CourseId = 4, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 6, CourseId = 4, SubjectLevel = 3 },
-                new SubjectRequired { SubjectId = 10, CourseId = 4, SubjectLevel = 3 }
-            };
-
-            context.SubjectRequireds.AddRange(subjectRequired);
-            context.SaveChanges();
-        }
-
-        private static void SeedAlternativeSubjects(ApplicationDbContext context)
-        {
-            var alternativeSubjects = new AlternativeSubject[]
-            {
-                new AlternativeSubject { SubjectId = 7, CourseId = 1, AlternativeSubjectName = "Mathematical Literacy", AlternativeSubjectLevel = 5 },
-                new AlternativeSubject { SubjectId = 7, CourseId = 2, AlternativeSubjectName = "Mathematical Literacy", AlternativeSubjectLevel = 5 },
-                new AlternativeSubject { SubjectId = 7, CourseId = 3, AlternativeSubjectName = "Mathematical Literacy", AlternativeSubjectLevel = 4 },
-                new AlternativeSubject { SubjectId = 7, CourseId = 4, AlternativeSubjectName = "Mathematical Literacy", AlternativeSubjectLevel = 4 }
-            };
-
-            context.AlternativeSubjects.AddRange(alternativeSubjects);
             context.SaveChanges();
         }
     }
