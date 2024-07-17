@@ -159,6 +159,36 @@ namespace StudentApplicationGuidance.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("StudentApplicationGuidance.Data.AlternativeSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlternativeSubjectLevel")
+                        .HasColumnType("int");
+
+                    b.Property<string>("AlternativeSubjectName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("AlternativeSubjects");
+                });
+
             modelBuilder.Entity("StudentApplicationGuidance.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -261,6 +291,56 @@ namespace StudentApplicationGuidance.Migrations
                     b.ToTable("Subjects");
                 });
 
+            modelBuilder.Entity("StudentApplicationGuidance.Data.SubjectRequired", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectLevel")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("SubjectRequireds");
+                });
+
+            modelBuilder.Entity("StudentApplicationGuidance.Models.Course", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
+
+                    b.Property<string>("CourseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<string>("University")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CourseId");
+
+                    b.ToTable("Courses");
+                });
+
             modelBuilder.Entity("StudentApplicationGuidance.Models.UserSubject", b =>
                 {
                     b.Property<int>("Id")
@@ -339,6 +419,44 @@ namespace StudentApplicationGuidance.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("StudentApplicationGuidance.Data.AlternativeSubject", b =>
+                {
+                    b.HasOne("StudentApplicationGuidance.Models.Course", "Course")
+                        .WithMany("AlternativeSubjects")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentApplicationGuidance.Data.Subject", "Subject")
+                        .WithMany("AlternativeSubjects")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("StudentApplicationGuidance.Data.SubjectRequired", b =>
+                {
+                    b.HasOne("StudentApplicationGuidance.Models.Course", "Course")
+                        .WithMany("SubjectRequired")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentApplicationGuidance.Data.Subject", "Subject")
+                        .WithMany("SubjectRequired")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("StudentApplicationGuidance.Models.UserSubject", b =>
                 {
                     b.HasOne("StudentApplicationGuidance.Data.Subject", "Subject")
@@ -365,7 +483,18 @@ namespace StudentApplicationGuidance.Migrations
 
             modelBuilder.Entity("StudentApplicationGuidance.Data.Subject", b =>
                 {
+                    b.Navigation("AlternativeSubjects");
+
+                    b.Navigation("SubjectRequired");
+
                     b.Navigation("UserSubjects");
+                });
+
+            modelBuilder.Entity("StudentApplicationGuidance.Models.Course", b =>
+                {
+                    b.Navigation("AlternativeSubjects");
+
+                    b.Navigation("SubjectRequired");
                 });
 #pragma warning restore 612, 618
         }

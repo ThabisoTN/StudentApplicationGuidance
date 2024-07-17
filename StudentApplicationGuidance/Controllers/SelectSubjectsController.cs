@@ -27,7 +27,7 @@ namespace StudentApplicationGuidance.Controllers
         public async Task<IActionResult> Create()
         {
             var subjects = await _userSubjectService.GetAllSubjects();
-            ViewBag.Subjects = subjects; // Ensure subjects here are objects with Id and Name properties
+            ViewBag.Subjects = subjects;
 
             return View();
         }
@@ -70,7 +70,7 @@ namespace StudentApplicationGuidance.Controllers
                     }
 
                     await _userSubjectService.AddUserSubjectsAsync(userId, subjectIds, levels);
-                    return RedirectToAction("ViewSubjects", "UserSubjects"); // Redirect to view subjects action in SelectSubjectsController
+                    return RedirectToAction("ViewSubjects", "UserSubjects");
                 }
                 catch (Exception ex)
                 {

@@ -8,5 +8,8 @@ namespace StudentApplicationGuidance.Data
 
         public string Name { get; set; }
         public virtual ICollection<UserSubject> UserSubjects { get; set; }
+        public virtual ICollection<SubjectRequired> SubjectRequired { get; set; }
+        public virtual ICollection<AlternativeSubject> AlternativeSubjects { get; set; }
+
     }
 }
