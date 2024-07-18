@@ -38,6 +38,8 @@ namespace StudentApplicationGuidance
             // Add SubjectServices to DI container
             builder.Services.AddScoped<SubjectService>(); // Example for SubjectServices
             builder.Services.AddScoped<UserSubjectService>(); // Example for UserSubjectService
+            builder.Services.AddScoped<CourseQualificationService>();
+            
 
             // Controllers and Views configuration
             builder.Services.AddControllersWithViews();
