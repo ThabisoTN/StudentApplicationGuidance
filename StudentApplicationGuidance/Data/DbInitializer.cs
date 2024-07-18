@@ -36,11 +36,51 @@ namespace StudentApplicationGuidance.Data
                 SeedAlternativeSubjects(context);
             }
 
-            // Seed provinces if the Provinces table is empty
             if (!context.Provinces.Any())
             {
                 SeedProvinces(context);
             }
+
+            // Seed funding sources if the FundingSources table is empty
+            if (!context.FundingSources.Any())
+            {
+                SeedFundingSources(context);
+            }
+        }
+
+
+        private static void SeedFundingSources(ApplicationDbContext context)
+        {
+            var fundingSources = new FundingSource[]
+            {
+                new FundingSource { Name = "NSFAS" },
+                new FundingSource { Name = "Bursary" },
+            new FundingSource { Name = "Self-funded" }
+            };
+
+            context.FundingSources.AddRange(fundingSources);
+            context.SaveChanges();
+        }
+
+
+        private static void SeedProvinces(ApplicationDbContext context)
+        {
+            var provinces = new Province[]
+            {
+            new Province { Name = "Eastern Cape" },
+            new Province { Name = "Free State" },
+            new Province { Name = "Gauteng" },
+            new Province { Name = "KwaZulu-Natal" },
+            new Province { Name = "Limpopo" },
+            new Province { Name = "Mpumalanga" },
+            new Province { Name = "Northern Cape" },
+            new Province { Name = "North West" },
+            new Province { Name = "Western Cape" }
+            };
+
+            context.Provinces.AddRange(provinces);
+            context.SaveChanges();
+        }
 
         private static void SeedSubjects(ApplicationDbContext context)
         {
