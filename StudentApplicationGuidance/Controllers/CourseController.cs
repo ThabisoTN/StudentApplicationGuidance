@@ -98,7 +98,7 @@ namespace StudentApplicationGuidance.Controllers
                 var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
                 string message = qualifies
-                    ? "You qualify for the course. You can apply for it at the selected university."
+                    ? "Congratulations! You qualify for the course based on your selected subjects and levels. You can now proceed to apply for this course at your chosen university. Best of luck with your application!"
                     : $"You do not meet the minimum requirements for this course. Reasons:\n{string.Join("\n", reasons)}";
 
                 return Json(new { success = qualifies, message = message });

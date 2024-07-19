@@ -118,7 +118,7 @@
                         modalBody.style.color = 'green'; // Green text for success
                         document.getElementById('qualificationModal').getElementsByClassName('modal-content')[0].style.borderColor = 'green'; // Green border for success
                     } else {
-                        modalBody.textContent = data.message;
+                        modalBody.innerHTML = data.message.split('\n').map(line => `<p>${line}</p>`).join('');
                         modalBody.style.color = 'red'; // Red text for failure
                         document.getElementById('qualificationModal').getElementsByClassName('modal-content')[0].style.borderColor = 'red'; // Red border for failure
                     }

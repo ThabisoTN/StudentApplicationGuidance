@@ -26,8 +26,7 @@ namespace StudentApplicationGuidance.Services
             // Checking if user has any of the altenative subjects. 
             if (alternativeSubjects.Any())
             {
-                bool hasAlternative = alternativeSubjects.Any(altSub =>
-                    userSubjects.Any(us => us.SubjectId == altSub.SubjectId && us.Level >= altSub.AlternativeSubjectLevel));
+                bool hasAlternative = alternativeSubjects.Any(altSub =>userSubjects.Any(us => us.SubjectId == altSub.SubjectId && us.Level >= altSub.AlternativeSubjectLevel));
                 if (!hasAlternative)
                 {
                     reasons.Add("You do not have any of the required alternative subject");
