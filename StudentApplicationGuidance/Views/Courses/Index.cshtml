@@ -1,0 +1,73 @@
+﻿@using StudentApplicationGuidance.ModelView
+@model CourseListViewModel
+
+@{
+    ViewData["Title"] = "View Courses";
+}
+
+<h2>Available Courses</h2>
+
+<div class="row">
+    @foreach (var course in Model.Courses)
+    {
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@course.CourseName</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@course.University</h6>
+                    <p class="card-text">Required Points: @course.Points</p>
+                    <h6>Required Subjects:</h6>
+                    <ul>
+                        @foreach (var subject in course.SubjectRequired)
+                        {
+                            <li>@subject.Subject.Name (Level @subject.SubjectLevel)</li>
+                        }
+                    </ul>
+                    @if (course.AlternativeSubjects.Any())
+                    {
+                        <h6>Alternative Subjects:</h6>
+                        <ul>
+                            @foreach (var altSubject in course.AlternativeSubjects)
+                            {
+                                <li>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</li>
+                            }
+                        </ul>
+                    }
+                    <div id="eligibilityMessage_@course.CourseId" class="alert alert-info mt-3">
+                        Check your eligibility for this course.
+                    </div>
+                    <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })" class="btn btn-primary mt-2">Check Qualification</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.card').each(function () {
+                var card = $(this);
+                var university = card.find('.card-subtitle').text().trim();
+                var courseName = card.find('.card-title').text().trim();
+                var messageDiv = card.find('[id^="eligibilityMessage_"]');
+
+                $.ajax({
+                    url: '@Url.Action("CheckQualificationAjax", "Courses")',
+                    type: 'POST',
+                    data: { university: university, courseName: courseName },
+                    success: function (result) {
+                        messageDiv.removeClass('alert-info').addClass(result.success ? 'alert-success' : 'alert-danger');
+                        messageDiv.text(result.message);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        console.log('Response:', xhr.responseText);
+                        messageDiv.removeClass('alert-info').addClass('alert-danger');
+                        messageDiv.text('An error occurred while checking qualification. Please try again later.');
+                    }
+                });
+            });
+        });
+    </script>
+}
