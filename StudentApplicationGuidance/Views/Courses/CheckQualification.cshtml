@@ -1,0 +1,59 @@
+﻿@using StudentApplicationGuidance.ModelView
+@model QualificationResultViewModel 
+
+@{
+    ViewData["Title"] = "Qualification Result";
+}
+
+<div class="container mt-4">
+    <h2>Qualification Result for @Model.Course.CourseName</h2>
+    <h4 class="text-muted">@Model.Course.University</h4>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Qualification Status</h5>
+            @if (Model.Qualifies)
+            {
+                <div class="alert alert-success">
+                    Congratulations! You qualify for this course.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    Unfortunately, you do not meet the minimum requirements for this course.
+                </div>
+            }
+
+            <h5 class="mt-4">Details:</h5>
+            <ul>
+                @foreach (var reason in Model.Reasons)
+                {
+                    <li>@reason</li>
+                }
+            </ul>
+
+            <h5 class="mt-4">Course Requirements:</h5>
+            <p>Required Points: @Model.Course.Points</p>
+            <h6>Required Subjects:</h6>
+            <ul>
+                @foreach (var subject in Model.Course.SubjectRequired)
+                {
+                    <li>@subject.Subject.Name (Level @subject.SubjectLevel)</li>
+                }
+            </ul>
+            @if (Model.Course.AlternativeSubjects.Any())
+            {
+                <h6>Alternative Subjects:</h6>
+                <ul>
+                    @foreach (var altSubject in Model.Course.AlternativeSubjects)
+                    {
+                        <li>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <a href="@Url.Action("Index", "Courses")" class="btn btn-primary mt-4">Back to Course List</a>
+</div>
