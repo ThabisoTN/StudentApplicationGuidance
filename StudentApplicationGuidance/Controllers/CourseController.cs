@@ -26,6 +26,8 @@ namespace StudentApplicationGuidance.Controllers
             _logger = logger;
         }
 
+
+
         [HttpGet]
         public async Task<IActionResult> SelectCourse()
         {
@@ -96,7 +98,7 @@ namespace StudentApplicationGuidance.Controllers
                 var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
                 string message = qualifies
-                    ? "You qualify for the course."
+                    ? "You qualify for the course. You can apply for it at the selected university."
                     : $"You do not meet the minimum requirements for this course. Reasons:\n{string.Join("\n", reasons)}";
 
                 return Json(new { success = qualifies, message = message });

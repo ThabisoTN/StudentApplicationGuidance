@@ -19,26 +19,26 @@ namespace StudentApplicationGuidance.Services
                 var userSubject = userSubjects.FirstOrDefault(us => us.SubjectId == requiredSubject.SubjectId);
                 if (userSubject == null || userSubject.Level < requiredSubject.SubjectLevel)
                 {
-                    reasons.Add($"Missing or insufficient level for {requiredSubject.Subject.Name}. Required level: {requiredSubject.SubjectLevel}");
+                    reasons.Add($"You do not have required subject or Your level for {requiredSubject.Subject.Name} is bellow required level for this course,  Required level is: {requiredSubject.SubjectLevel},");
                 }
             }
 
-            // Check alternative subjects
-            //if (alternativeSubjects.Any())
-            //{
-            //    bool hasAlternative = alternativeSubjects.Any(altSub =>
-            //        userSubjects.Any(us => us.SubjectId == altSub.SubjectId && us.Level >= altSub.AlternativeSubjectLevel));
-            //    if (!hasAlternative)
-            //    {
-            //        reasons.Add("Missing required alternative subject");
-            //    }
-            //}
+            // Checking if user has any of the altenative subjects. 
+            if (alternativeSubjects.Any())
+            {
+                bool hasAlternative = alternativeSubjects.Any(altSub =>
+                    userSubjects.Any(us => us.SubjectId == altSub.SubjectId && us.Level >= altSub.AlternativeSubjectLevel));
+                if (!hasAlternative)
+                {
+                    reasons.Add("You do not have any of the required alternative subject");
+                }
+            }
 
-            // Calculate total points
+            // Calculating user total subject points 
             int totalPoints = CalculateTotalPoints(userSubjects);
             if (totalPoints < course.Points)
             {
-                reasons.Add($"Insufficient points. Required: {course.Points}, Achieved: {totalPoints}");
+                reasons.Add($"Your total  points does not meet required number of points. Required: {course.Points}, while you achieved a total of : {totalPoints} poimys excluding LO.");
             }
 
             return (reasons.Count == 0, reasons);
@@ -46,9 +46,7 @@ namespace StudentApplicationGuidance.Services
 
         private int CalculateTotalPoints(List<UserSubject> userSubjects)
         {
-            return userSubjects
-                .Where(us => us.Level > 1 && us.Subject.Name != "Life Orientation")
-                .Sum(us => us.Level);
+            return userSubjects.Where(us => us.Level > 1 && us.Subject.Name != "Life Orientation").Sum(us => us.Level);
         }
     }
 }

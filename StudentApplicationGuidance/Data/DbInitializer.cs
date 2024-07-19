@@ -49,13 +49,65 @@ namespace StudentApplicationGuidance.Data
         }
 
 
+        //university with their courses and required points
+        private static void SeedCourses(ApplicationDbContext context)
+        {
+            var courses = new Course[]
+            {
+                new Course { University = "UKZN", CourseName = "B Sc Computer Science & Information Technology", Points = 34 },
+                new Course { University = "DUT", CourseName = "Bachelor of Information and Communications Technology", Points = 30 },
+                new Course { University = "MUT", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },
+                new Course { University = "MUT", CourseName = "Advanced Diploma in Information Technology", Points = 25 }
+            };
+
+            context.Courses.AddRange(courses);
+            context.SaveChanges();
+        }
+        
+        //Course Required subject and level.   
+        private static void SeedSubjectRequired(ApplicationDbContext context)
+        {
+            var subjectRequired = new SubjectRequired[]
+            {
+                new SubjectRequired { SubjectId = 1, CourseId = 1, SubjectLevel = 5 },
+                new SubjectRequired { SubjectId = 2, CourseId = 1, SubjectLevel = 4 },
+                new SubjectRequired { SubjectId = 3, CourseId = 1, SubjectLevel = 4 },
+                new SubjectRequired { SubjectId = 4, CourseId = 2, SubjectLevel = 4 },
+                new SubjectRequired { SubjectId = 1, CourseId = 2, SubjectLevel = 4 },
+                new SubjectRequired { SubjectId = 4, CourseId = 3, SubjectLevel = 3 },
+                new SubjectRequired { SubjectId = 1, CourseId = 3, SubjectLevel = 2 },
+                new SubjectRequired { SubjectId = 1, CourseId = 4, SubjectLevel = 4 },
+                new SubjectRequired { SubjectId = 2, CourseId = 4, SubjectLevel = 4 },
+                new SubjectRequired { SubjectId = 5, CourseId = 4, SubjectLevel = 4 }
+            };
+
+            context.SubjectRequireds.AddRange(subjectRequired);
+            context.SaveChanges();
+        }
+
+        //Course altenative subjects and levels.
+        private static void SeedAlternativeSubjects(ApplicationDbContext context)
+        {
+            var alternativeSubjects = new AlternativeSubject[]
+            {
+                new AlternativeSubject { SubjectId = 1, CourseId = 1, AlternativeSubjectName = "Math", AlternativeSubjectLevel = 5 },
+                new AlternativeSubject { SubjectId = 4, CourseId = 1, AlternativeSubjectName = "Eng", AlternativeSubjectLevel = 4 }
+            };
+
+            context.AlternativeSubjects.AddRange(alternativeSubjects);
+            context.SaveChanges();
+        }
+       
+
+        //User source of funding.
         private static void SeedFundingSources(ApplicationDbContext context)
         {
             var fundingSources = new FundingSource[]
             {
                 new FundingSource { Name = "NSFAS" },
                 new FundingSource { Name = "Bursary" },
-            new FundingSource { Name = "Self-funded" }
+                new FundingSource { Name = "Self-funded" },
+                new FundingSource { Name = "Scholarship" }
             };
 
             context.FundingSources.AddRange(fundingSources);
@@ -63,6 +115,7 @@ namespace StudentApplicationGuidance.Data
         }
 
 
+        //Provinces
         private static void SeedProvinces(ApplicationDbContext context)
         {
             var provinces = new Province[]
@@ -82,11 +135,14 @@ namespace StudentApplicationGuidance.Data
             context.SaveChanges();
         }
 
+
+        //Subjects
         private static void SeedSubjects(ApplicationDbContext context)
         {
             var listofSubjects = new Subject[]
             {
                 new Subject { Name = "English Home Language" },
+                new Subject {Name = "English First Editional Language"}, 
                 new Subject { Name = "Afrikaans Home Language" },
                 new Subject { Name = "Afrikaans First Additional Language" },
                 new Subject { Name = "IsiZulu Home Language" },

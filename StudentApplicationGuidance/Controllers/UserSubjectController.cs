@@ -23,10 +23,7 @@ namespace StudentApplicationGuidance.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Fetch user subjects with related subject information
-            var userSubjects = await _context.UserSubjects
-                .Include(us => us.Subject) // Include related subject entity
-                .Where(us => us.UserId == userId)
-                .ToListAsync();
+            var userSubjects = await _context.UserSubjects.Include(us => us.Subject).Where(us => us.UserId == userId).ToListAsync();
 
             return View(userSubjects);
         }
