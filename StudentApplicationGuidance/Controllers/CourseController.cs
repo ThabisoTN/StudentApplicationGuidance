@@ -29,21 +29,35 @@ namespace StudentApplicationGuidance.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string university)
         {
-            _logger.LogInformation("Index action method called");
+            var universities = await _context.Courses.Select(c => c.University).Distinct().OrderBy(u => u).ToListAsync();
 
-            var courses = await _context.Courses
+            var coursesQuery = _context.Courses
                 .Include(c => c.SubjectRequired)
                     .ThenInclude(sr => sr.Subject)
                 .Include(c => c.AlternativeSubjects)
                     .ThenInclude(asub => asub.Subject)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(university))
+            {
+                coursesQuery = coursesQuery.Where(c => c.University == university);
+            }
+
+            var courses = await coursesQuery.ToListAsync();
 
             var viewModel = new CourseListViewModel
             {
-                Courses = courses
+                Courses = courses,
+                Universities = universities,
+                SelectedUniversity = university
             };
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_CourseCards", courses);
+            }
 
             return View(viewModel);
         }

@@ -86,7 +86,7 @@ namespace StudentApplicationGuidance.Data
         }
 
         //Course altenative subjects and levels.
-        private static void SeedAlternativeSubjects(ApplicationDbContext context)
+        private static void SeedAlternativeSubjects(ApplicationDbContext context) //possible fix status
         {
             var alternativeSubjects = new AlternativeSubject[]
             {
