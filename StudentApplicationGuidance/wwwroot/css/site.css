@@ -1,3 +1,49 @@
+:root {
+    --primary-blue: #007bff;
+    --dark-blue: #0056b3;
+    --light-blue: #e6f2ff;
+    --black: #000000;
+    --white: #ffffff;
+    --yellow: #ffc107;
+    --light-gray: #f8f9fa;
+    --card-bg: #f0f8ff;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--black);
+    background-color: var(--white);
+}
+
+.container {
+    flex: 1;
+}
+
+footer {
+    background-color: var(--black);
+    color: var(--white);
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+    footer a {
+        color: var(--primary-blue);
+        text-decoration: none;
+    }
+
+        footer a:hover {
+            color: var(--light-blue);
+            text-decoration: underline;
+        }
+
 /* Home page styles */
 .home-container {
     max-width: 1200px;
@@ -8,7 +54,7 @@
 .hero {
     text-align: center;
     padding: 60px 0;
-    background-color: #f8f9fa;
+    background-color: var(--light-blue);
     border-radius: 10px;
     margin-bottom: 40px;
 }
@@ -16,11 +62,13 @@
     .hero h1 {
         font-size: 2.5rem;
         margin-bottom: 20px;
+        color: var(--black);
     }
 
     .hero p {
         font-size: 1.2rem;
         margin-bottom: 30px;
+        color: var(--black);
     }
 
 .features {
@@ -30,38 +78,116 @@
     .features h2 {
         text-align: center;
         margin-bottom: 30px;
+        color: var(--black);
     }
 
 .feature-card {
-    background-color: #ffffff;
-    border: 1px solid #e9ecef;
+    background-color: var(--card-bg);
+    border: 2px solid var(--primary-blue);
     border-radius: 10px;
     padding: 20px;
     height: 100%;
     transition: all 0.3s ease;
+    margin-bottom: 20px;
 }
 
     .feature-card:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
     }
 
     .feature-card h3 {
         font-size: 1.3rem;
         margin-bottom: 15px;
+        color: var(--primary-blue);
+    }
+
+    .feature-card p {
+        color: var(--black);
     }
 
 .cta {
     text-align: center;
     padding: 60px 0;
-    background-color: #e9ecef;
+    background-color: var(--light-blue);
     border-radius: 10px;
+    margin-bottom: 40px;
 }
 
     .cta h2 {
         margin-bottom: 30px;
+        color: var(--black);
     }
 
-.btn-primary, .btn-secondary {
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: var(--white);
     padding: 10px 20px;
     font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: var(--dark-blue);
+        border-color: var(--dark-blue);
+        transform: translateY(-2px);
+    }
+
+.btn-secondary {
+    background-color: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--black);
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+    .btn-secondary:hover {
+        background-color: #e0a800;
+        border-color: #e0a800;
+        transform: translateY(-2px);
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero {
+        padding: 40px 0;
+    }
+
+        .hero h1 {
+            font-size: 2rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+        }
+
+    .feature-card {
+        margin-bottom: 20px;
+    }
+
+    .cta {
+        padding: 40px 0;
+    }
+}
+
+/* New styles for better card layout */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -10px;
+    margin-left: -10px;
+}
+
+.col-md-4 {
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+@media (min-width: 768px) {
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
 }
