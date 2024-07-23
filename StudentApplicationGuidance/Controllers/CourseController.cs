@@ -108,12 +108,7 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "University and course must be selected." });
                 }
 
-                var course = await _context.Courses
-                    .Include(c => c.SubjectRequired)
-                        .ThenInclude(sr => sr.Subject)
-                    .Include(c => c.AlternativeSubjects)
-                        .ThenInclude(asub => asub.Subject)
-                    .FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
+                var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
 
                 if (course == null)
                 {
@@ -139,7 +134,7 @@ namespace StudentApplicationGuidance.Controllers
                 var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
                 string message = qualifies
-                    ? "Congratulations! You qualify for the course based on your selected subjects and levels. You can now proceed to apply for this course at your chosen university. Best of luck with your application!"
+                    ? "Congratulations! You qualify for the course based on your subjects and levels. You can now proceed to apply for this course at your chosen university. Best of luck with your application!"
                     : $"You do not meet the minimum requirements for this course. Reasons:\n{string.Join("\n", reasons)}";
 
                 return Json(new { success = qualifies, message = message });
@@ -177,10 +172,7 @@ namespace StudentApplicationGuidance.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var userSubjects = await _context.UserSubjects
-                .Where(us => us.UserId == userId)
-                .Include(us => us.Subject)
-                .ToListAsync();
+            var userSubjects = await _context.UserSubjects .Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
 
             var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
