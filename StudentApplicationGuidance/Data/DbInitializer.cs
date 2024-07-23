@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using StudentApplicationGuidance.Models;
 using System.Linq;
 
@@ -54,10 +55,10 @@ namespace StudentApplicationGuidance.Data
         {
             var courses = new Course[]
             {
-                new Course { University = "UKZN", CourseName = "B Sc Computer Science & Information Technology", Points = 34 },
-                new Course { University = "DUT", CourseName = "Bachelor of Information and Communications Technology", Points = 30 },
-                new Course { University = "MUT", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },
-                new Course { University = "MUT", CourseName = "Advanced Diploma in Information Technology", Points = 25 }
+                new Course { University = "University of KwaZulu-Natal", CourseName = "B Sc Computer Science & Information Technology", Points = 34 },
+                new Course { University = "Durban University of Technology", CourseName = "Bachelor of Information and Communications Technology", Points = 30 },
+                new Course { University = "Mangosuthu University of Technology", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },
+                //new Course { University = "Mangosuthu University of Technology", CourseName = "Advanced Diploma in Information Technology", Points = 25 }
             };
 
             context.Courses.AddRange(courses);
@@ -69,16 +70,16 @@ namespace StudentApplicationGuidance.Data
         {
             var subjectRequired = new SubjectRequired[]
             {
-                new SubjectRequired { SubjectId = 1, CourseId = 1, SubjectLevel = 5 },
-                new SubjectRequired { SubjectId = 2, CourseId = 1, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 3, CourseId = 1, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 4, CourseId = 2, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 1, CourseId = 2, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 4, CourseId = 3, SubjectLevel = 3 },
-                new SubjectRequired { SubjectId = 1, CourseId = 3, SubjectLevel = 2 },
-                new SubjectRequired { SubjectId = 1, CourseId = 4, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 2, CourseId = 4, SubjectLevel = 4 },
-                new SubjectRequired { SubjectId = 5, CourseId = 4, SubjectLevel = 4 }
+                //First course
+                new SubjectRequired {SubjectId=7, CourseId=1, SubjectLevel=5},
+                new SubjectRequired {SubjectId=9,CourseId=1, SubjectLevel=4},
+
+                //Second course
+                new SubjectRequired {SubjectId=7,CourseId=2, SubjectLevel=4},
+
+                //Third course
+                new SubjectRequired{SubjectId=7, CourseId=3, SubjectLevel=4},
+                
             };
 
             context.SubjectRequireds.AddRange(subjectRequired);
@@ -86,52 +87,85 @@ namespace StudentApplicationGuidance.Data
         }
 
         //Course altenative subjects and levels.
-        private static void SeedAlternativeSubjects(ApplicationDbContext context) //possible fix status
+        private static void SeedAlternativeSubjects(ApplicationDbContext context)
         {
             var alternativeSubjects = new AlternativeSubject[]
             {
-                new AlternativeSubject { SubjectId = 1, CourseId = 1, AlternativeSubjectName = "Math", AlternativeSubjectLevel = 5 },
-                new AlternativeSubject { SubjectId = 4, CourseId = 1, AlternativeSubjectName = "Eng", AlternativeSubjectLevel = 4 }
+                //First Course
+                new AlternativeSubject {SubjectId=19, CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="Gricultural Science"},
+                new AlternativeSubject{SubjectId=11,CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="Life Science"}, 
+                new AlternativeSubject{ SubjectId=10,CourseId=1, AlternativeSubjectLevel =4, AlternativeSubjectName="Physical Science"},
+                new AlternativeSubject{SubjectId=1,CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="Enhlish Home Language"}, 
+                new AlternativeSubject{SubjectId=2, CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="English First Additional Language"},
+
+                //Second course
+                new AlternativeSubject { SubjectId = 1, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English Home Language" },
+                new AlternativeSubject { SubjectId = 2, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
+                new AlternativeSubject { SubjectId = 3, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Afrikaans Home Language" },
+                new AlternativeSubject { SubjectId = 4, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Afrikaans First Additional Language" },
+                new AlternativeSubject { SubjectId = 5, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "IsiZulu Home Language" },
+                new AlternativeSubject { SubjectId = 6, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "IsiZulu First Additional Language" },
+                new AlternativeSubject { SubjectId = 7, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematics" },
+                new AlternativeSubject { SubjectId = 8, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematical Literacy" },
+                new AlternativeSubject { SubjectId = 9, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Life Orientation" },
+                new AlternativeSubject { SubjectId = 10, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Physical Science" },
+                new AlternativeSubject { SubjectId = 11, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Life Sciences" },
+                new AlternativeSubject { SubjectId = 12, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Geography" },
+                new AlternativeSubject { SubjectId = 13, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "History" },
+                new AlternativeSubject { SubjectId = 14, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Accounting" },
+                new AlternativeSubject { SubjectId = 15, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Business Studies" },
+                new AlternativeSubject { SubjectId = 16, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Economics" },
+                new AlternativeSubject { SubjectId = 17, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Information Technology" },
+                new AlternativeSubject { SubjectId = 18, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Computer Applications Technology" },
+                new AlternativeSubject { SubjectId = 19, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Science" },
+                new AlternativeSubject { SubjectId = 20, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Technology" },
+                new AlternativeSubject { SubjectId = 21, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Management Practices" },
+                new AlternativeSubject { SubjectId = 22, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Tourism" },
+                new AlternativeSubject { SubjectId = 23, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Hospitality Studies" },
+                new AlternativeSubject { SubjectId = 24, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Consumer Studies" },
+                new AlternativeSubject { SubjectId = 25, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Engineering Graphics and Design" },
+                new AlternativeSubject { SubjectId = 26, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Visual Arts" },
+                new AlternativeSubject { SubjectId = 27, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dance Studies" },
+                new AlternativeSubject { SubjectId = 28, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Design" },
+                new AlternativeSubject { SubjectId = 29, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dramatic Arts" },
+                new AlternativeSubject { SubjectId = 30, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Music" }, 
+
+                //Third course
+                new AlternativeSubject { SubjectId = 1, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English Home Language" },
+    new AlternativeSubject { SubjectId = 2, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
+    new AlternativeSubject { SubjectId = 3, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Afrikaans Home Language" },
+    new AlternativeSubject { SubjectId = 4, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Afrikaans First Additional Language" },
+    new AlternativeSubject { SubjectId = 5, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "IsiZulu Home Language" },
+    new AlternativeSubject { SubjectId = 6, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "IsiZulu First Additional Language" },
+    new AlternativeSubject { SubjectId = 7, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematics" },
+    new AlternativeSubject { SubjectId = 8, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematical Literacy" },
+    new AlternativeSubject { SubjectId = 9, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Life Orientation" },
+    new AlternativeSubject { SubjectId = 10, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Physical Science" },
+    new AlternativeSubject { SubjectId = 11, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Life Sciences" },
+    new AlternativeSubject { SubjectId = 12, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Geography" },
+    new AlternativeSubject { SubjectId = 13, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "History" },
+    new AlternativeSubject { SubjectId = 14, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Accounting" },
+    new AlternativeSubject { SubjectId = 15, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Business Studies" },
+    new AlternativeSubject { SubjectId = 16, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Economics" },
+    new AlternativeSubject { SubjectId = 17, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Information Technology" },
+    new AlternativeSubject { SubjectId = 18, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Computer Applications Technology" },
+    new AlternativeSubject { SubjectId = 19, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Science" },
+    new AlternativeSubject { SubjectId = 20, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Technology" },
+    new AlternativeSubject { SubjectId = 21, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Management Practices" },
+    new AlternativeSubject { SubjectId = 22, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Tourism" },
+    new AlternativeSubject { SubjectId = 23, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Hospitality Studies" },
+    new AlternativeSubject { SubjectId = 24, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Consumer Studies" },
+    new AlternativeSubject { SubjectId = 25, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Engineering Graphics and Design" },
+    new AlternativeSubject { SubjectId = 26, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Visual Arts" },
+    new AlternativeSubject { SubjectId = 27, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dance Studies" },
+    new AlternativeSubject { SubjectId = 28, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Design" },
+    new AlternativeSubject { SubjectId = 29, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dramatic Arts" },
+    new AlternativeSubject { SubjectId = 30, CourseId = 3, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Music" }
+
+
             };
 
             context.AlternativeSubjects.AddRange(alternativeSubjects);
-            context.SaveChanges();
-        }
-       
-
-        //User source of funding.
-        private static void SeedFundingSources(ApplicationDbContext context)
-        {
-            var fundingSources = new FundingSource[]
-            {
-                new FundingSource { Name = "NSFAS" },
-                new FundingSource { Name = "Bursary" },
-                new FundingSource { Name = "Self-funded" },
-                new FundingSource { Name = "Scholarship" }
-            };
-
-            context.FundingSources.AddRange(fundingSources);
-            context.SaveChanges();
-        }
-
-
-        //Provinces
-        private static void SeedProvinces(ApplicationDbContext context)
-        {
-            var provinces = new Province[]
-            {
-            new Province { Name = "Eastern Cape" },
-            new Province { Name = "Free State" },
-            new Province { Name = "Gauteng" },
-            new Province { Name = "KwaZulu-Natal" },
-            new Province { Name = "Limpopo" },
-            new Province { Name = "Mpumalanga" },
-            new Province { Name = "Northern Cape" },
-            new Province { Name = "North West" },
-            new Province { Name = "Western Cape" }
-            };
-
-            context.Provinces.AddRange(provinces);
             context.SaveChanges();
         }
 
@@ -176,5 +210,44 @@ namespace StudentApplicationGuidance.Data
             context.Subjects.AddRange(listofSubjects);
             context.SaveChanges();
         }
+        
+        //User source of funding.
+        private static void SeedFundingSources(ApplicationDbContext context)
+        {
+            var fundingSources = new FundingSource[]
+            {
+                new FundingSource { Name = "NSFAS" },
+                new FundingSource { Name = "Bursary" },
+                new FundingSource { Name = "Self-funded" },
+                new FundingSource { Name = "Scholarship" }
+            };
+
+            context.FundingSources.AddRange(fundingSources);
+            context.SaveChanges();
+        }
+
+
+        //Provinces
+        private static void SeedProvinces(ApplicationDbContext context)
+        {
+            var provinces = new Province[]
+            {
+            new Province { Name = "Eastern Cape" },
+            new Province { Name = "Free State" },
+            new Province { Name = "Gauteng" },
+            new Province { Name = "KwaZulu-Natal" },
+            new Province { Name = "Limpopo" },
+            new Province { Name = "Mpumalanga" },
+            new Province { Name = "Northern Cape" },
+            new Province { Name = "North West" },
+            new Province { Name = "Western Cape" }
+            };
+
+            context.Provinces.AddRange(provinces);
+            context.SaveChanges();
+        }
+
+
+
     }
 }

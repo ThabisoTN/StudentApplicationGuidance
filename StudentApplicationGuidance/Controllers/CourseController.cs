@@ -96,6 +96,8 @@ namespace StudentApplicationGuidance.Controllers
 
             return Json(courses);
         }
+
+
         [HttpPost]
         public async Task<IActionResult> CheckQualificationAjax(string university, string courseName)
         {

@@ -17,18 +17,18 @@
                 </ul>
                 @if (course.AlternativeSubjects.Any())
                 {
-                    <h6>Alternative Subjects:</h6>
+                    <h6>Other Required subjects:</h6>
                     <ul>
                         @foreach (var altSubject in course.AlternativeSubjects)
                         {
-                            <li>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</li>
+                            @* <li>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</li> *@
                         }
                     </ul>
                 }
                 <div id="eligibilityMessage_@course.CourseId" class="alert alert-info mt-3">
                     Check your eligibility for this course.
                 </div>
-                <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })" class="btn btn-primary mt-2">Check Qualification</a>
+                <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })" class="btn btn-primary mt-2">View more details</a>
             </div>
         </div>
     </div>
