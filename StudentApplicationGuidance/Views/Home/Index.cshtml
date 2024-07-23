@@ -2,7 +2,41 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-container">
+    <section class="hero">
+        <h1>Welcome to Student Application Guidance</h1>
+        <p>Your path to academic success starts here.</p>
+        <a href="@Url.Action("SelectCourse", "Courses")" class="btn btn-primary btn-lg">Get Started</a>
+    </section>
+
+    <section class="features">
+        <h2>Our Services</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3>Course Finder</h3>
+                    <p>Easily search and filter courses from various universities.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3>Qualification Check</h3>
+                    <p>Instantly verify if you meet the requirements for your chosen course.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <h3>University Insights</h3>
+                    <p>Get detailed information about universities and their offerings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <section class="cta">
+        <h2>Ready to find your perfect course?</h2>
+        <a href="@Url.Action("Index", "Courses")" class="btn btn-secondary btn-lg">View Courses</a>
+    </section>
 </div>

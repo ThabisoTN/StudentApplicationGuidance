@@ -1,22 +1,67 @@
-html {
-  font-size: 14px;
+/* Home page styles */
+.home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.hero {
+    text-align: center;
+    padding: 60px 0;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 40px;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
+
+.features {
+    margin-bottom: 40px;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .features h2 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+.feature-card {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+    transition: all 0.3s ease;
 }
 
-body {
-  margin-bottom: 60px;
+    .feature-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .feature-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+.cta {
+    text-align: center;
+    padding: 60px 0;
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+    .cta h2 {
+        margin-bottom: 30px;
+    }
+
+.btn-primary, .btn-secondary {
+    padding: 10px 20px;
+    font-size: 1.1rem;
 }
