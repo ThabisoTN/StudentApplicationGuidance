@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using StudentApplicationGuidance.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using StudentApplicationGuidance.Data;
+
 
 namespace StudentApplicationGuidance.Data
 {
@@ -71,14 +74,10 @@ namespace StudentApplicationGuidance.Data
             var subjectRequired = new SubjectRequired[]
             {
                 //First course
-                new SubjectRequired {SubjectId=7, CourseId=1, SubjectLevel=5},
+                new SubjectRequired {SubjectId=3, CourseId=1, SubjectLevel=5},
                 new SubjectRequired {SubjectId=9,CourseId=1, SubjectLevel=4},
 
-                //Second course
-                //new SubjectRequired {SubjectId=7,CourseId=2, SubjectLevel=4},
-
-                //Third course
-                //new SubjectRequired{SubjectId=7, CourseId=3, SubjectLevel=4},
+               
                 
             };
 
@@ -114,12 +113,12 @@ namespace StudentApplicationGuidance.Data
             {
                 new Subject { Name = "English Home Language" },
                 new Subject {Name = "English First Editional Language"}, 
-                new Subject { Name = "Afrikaans Home Language" },
-                new Subject { Name = "Afrikaans First Additional Language" },
-                new Subject { Name = "IsiZulu Home Language" },
-                new Subject { Name = "IsiZulu First Additional Language" },
                 new Subject { Name = "Mathematics" },
                 new Subject { Name = "Mathematical Literacy" },
+                new Subject { Name = "IsiZulu Home Language" },
+                new Subject { Name = "IsiZulu First Additional Language" },
+                new Subject { Name = "Afrikaans Home Language" },
+                new Subject { Name = "Afrikaans First Additional Language" },
                 new Subject { Name = "Life Orientation" },
                 new Subject { Name = "Physical Science" },
                 new Subject { Name = "Life Sciences" },

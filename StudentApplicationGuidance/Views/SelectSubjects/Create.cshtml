@@ -1,4 +1,32 @@
-﻿<form asp-action="Create" method="post">
+﻿
+
+@section Styles {
+    <style>
+        .error-popup {
+            color: #fff;
+            background-color: #dc3545;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none; /* Hidden by default */
+        }
+    </style>
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var validationMessage = '@ViewBag.ValidationMessage';
+            if (validationMessage) {
+                $('#error-popup').text(validationMessage.replace(/\\n/g, '\n')).show();
+            }
+        });
+    </script>
+}
+
+<div id="error-popup" class="error-popup"></div>
+
+<form asp-action="Create" method="post">
     @for (int i = 1; i <= 7; i++)
     {
         <div class="row mb-3">

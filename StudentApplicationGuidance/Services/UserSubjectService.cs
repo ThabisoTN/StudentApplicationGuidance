@@ -44,10 +44,7 @@ namespace StudentApplicationGuidance.Services
 
         public async Task<int> CalculatePoints(string userId)
         {
-            var userSubjects = await _context.UserSubjects
-                                             .Where(us => us.UserId == userId)
-                                             .Include(us => us.Subject)
-                                             .ToListAsync();
+            var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
 
             int totalPoints = userSubjects
                 .Where(us => us.Level > 1 && us.Subject.Name != "Life Orientation")
@@ -58,10 +55,7 @@ namespace StudentApplicationGuidance.Services
 
         public async Task<List<UserSubjectView>> GetUserSubjects(string userId)
         {
-            var userSubjects = await _context.UserSubjects
-                                     .Where(us => us.UserId == userId)
-                                     .Include(us => us.Subject)
-                                     .ToListAsync();
+            var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
 
             var userSubjectViews = userSubjects.Select(us => new UserSubjectView
             {

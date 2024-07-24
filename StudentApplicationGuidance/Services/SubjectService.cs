@@ -15,9 +15,6 @@ namespace StudentApplicationGuidance.Services
         public async Task<List<Subject>> GetSubjects()
         {
             var subjects = await _context.Subjects.ToListAsync();
-
-
-
             return subjects;
         }
     }
