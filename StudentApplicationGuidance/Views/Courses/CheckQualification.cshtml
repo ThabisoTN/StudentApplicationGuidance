@@ -1,5 +1,5 @@
 ﻿@using StudentApplicationGuidance.ModelView
-@model QualificationResultViewModel 
+@model QualificationResultViewModel
 
 @{
     ViewData["Title"] = "Qualification Result";
@@ -15,23 +15,23 @@
             @if (Model.Qualifies)
             {
                 <div class="alert alert-success">
-                    Congratulations! You qualify for this course.
+                    <h4 class="alert-heading">Congratulations!</h4>
+                    <p>You meet all the requirements for this course. You are eligible to apply.</p>
                 </div>
             }
             else
             {
                 <div class="alert alert-danger">
-                    Unfortunately, you do not meet the minimum requirements for this course.
+                    <h4 class="alert-heading">Requirements Not Met</h4>
+                    <p>Unfortunately, you do not meet all the minimum requirements for this course. Here's why:</p>
+                    <ul>
+                        @foreach (var reason in Model.Reasons)
+                        {
+                            <li>@reason</li>
+                        }
+                    </ul>
                 </div>
             }
-
-            <h5 class="mt-4">Details:</h5>
-            <ul>
-                @foreach (var reason in Model.Reasons)
-                {
-                    <li>@reason</li>
-                }
-            </ul>
 
             <h5 class="mt-4">Course Requirements:</h5>
             <p>Required Points: @Model.Course.Points</p>
@@ -39,16 +39,52 @@
             <ul>
                 @foreach (var subject in Model.Course.SubjectRequired)
                 {
-                    <li>@subject.Subject.Name (Level @subject.SubjectLevel)</li>
+                    <li>
+                        @subject.Subject.Name (Level @subject.SubjectLevel)
+                        @if (!Model.Qualifies && Model.UserSubjects.Any(us => us.Subject.Name == subject.Subject.Name))
+                        {
+                            var userSubject = Model.UserSubjects.First(us => us.Subject.Name == subject.Subject.Name);
+                            if (userSubject.Level < subject.SubjectLevel)
+                            {
+                                <span class="text-danger"> - Your level (@userSubject.Level) is below the required level (@subject.SubjectLevel)</span>
+                            }
+                            else
+                            {
+                                <span class="text-success"> - Requirement met</span>
+                            }
+                        }
+                        else if (!Model.Qualifies)
+                        {
+                            <span class="text-danger"> - Subject not taken</span>
+                        }
+                    </li>
                 }
             </ul>
             @if (Model.Course.AlternativeSubjects.Any())
             {
-                <h6>Other subjects:</h6>
+                <h6>Alternative Subjects (You need at least one):</h6>
                 <ul>
                     @foreach (var altSubject in Model.Course.AlternativeSubjects)
                     {
-                        <li>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</li>
+                        <li>
+                            @altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)
+                            @if (!Model.Qualifies && Model.UserSubjects.Any(us => us.Subject.Name == altSubject.AlternativeSubjectName))
+                            {
+                                var userSubject = Model.UserSubjects.First(us => us.Subject.Name == altSubject.AlternativeSubjectName);
+                                if (userSubject.Level < altSubject.AlternativeSubjectLevel)
+                                {
+                                    <span class="text-danger"> - Your level (@userSubject.Level) is below the required level (@altSubject.AlternativeSubjectLevel)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-success"> - Requirement met</span>
+                                }
+                            }
+                            else if (!Model.Qualifies)
+                            {
+                                <span class="text-danger"> - Subject not taken</span>
+                            }
+                        </li>
                     }
                 </ul>
             }

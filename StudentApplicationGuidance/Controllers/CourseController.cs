@@ -28,6 +28,7 @@ namespace StudentApplicationGuidance.Controllers
             _logger = logger;
         }
 
+
         [HttpGet]
         public async Task<IActionResult> Index(string university)
         {
@@ -81,6 +82,7 @@ namespace StudentApplicationGuidance.Controllers
             return View(modelView);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetCoursesByUniversity(string university)
         {
@@ -108,7 +110,12 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "University and course must be selected." });
                 }
 
-                var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
+                var course = await _context.Courses
+                    .Include(c => c.SubjectRequired)
+                        .ThenInclude(sr => sr.Subject)
+                    .Include(c => c.AlternativeSubjects)
+                        .ThenInclude(asub => asub.Subject)
+                    .FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
 
                 if (course == null)
                 {
@@ -118,7 +125,7 @@ namespace StudentApplicationGuidance.Controllers
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Json(new { success = false, message = "User not logged in. Please log in to check qualification." });
+                    return Json(new { success = false, message = "Please log in to check qualification." });
                 }
 
                 var userSubjects = await _context.UserSubjects
@@ -128,21 +135,21 @@ namespace StudentApplicationGuidance.Controllers
 
                 if (userSubjects == null || !userSubjects.Any())
                 {
-                    return Json(new { success = false, message = "User does not have subjects. Please save subjects to the system." });
+                    return Json(new { success = false, message = "Please add your subjects to check qualification." });
                 }
 
-                var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
+                var (qualifies, _) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
                 string message = qualifies
-                    ? "Congratulations! You qualify for the course based on your subjects and levels. You can now proceed to apply for this course at your chosen university. Best of luck with your application!"
-                    : $"You do not meet the minimum requirements for this course. Reasons:\n{string.Join("\n", reasons)}";
+                    ? "You qualify for this course."
+                    : "You do not meet all requirements for this course.";
 
                 return Json(new { success = qualifies, message = message });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking qualification for university: {University}, course: {CourseName}", university, courseName);
-                return Json(new { success = false, message = $"An error occurred while checking qualification: {ex.Message}" });
+                return Json(new { success = false, message = "An error occurred. Please try again." });
             }
         }
 
@@ -180,7 +187,8 @@ namespace StudentApplicationGuidance.Controllers
             {
                 Course = course,
                 Qualifies = qualifies,
-                Reasons = reasons
+                Reasons = reasons,
+                UserSubjects = userSubjects
             };
 
             return View(viewModel);

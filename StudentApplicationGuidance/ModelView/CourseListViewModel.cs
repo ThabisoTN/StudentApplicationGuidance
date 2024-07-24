@@ -8,6 +8,7 @@ namespace StudentApplicationGuidance.ModelView
         public List<Course> Courses { get; set; }
         public List<string> Universities { get; set; }
         public string SelectedUniversity { get; set; }
+        public bool Qualifies { get; set; }
     }
 
 }

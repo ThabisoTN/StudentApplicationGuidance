@@ -10,8 +10,10 @@ namespace StudentApplicationGuidance.Models
         public string University { get; set; }
         public string CourseName { get; set; }
         public int Points { get; set; }
+    
 
         public virtual ICollection<SubjectRequired> SubjectRequired { get; set; }
         public virtual ICollection<AlternativeSubject> AlternativeSubjects { get; set; }
+
     }
 }

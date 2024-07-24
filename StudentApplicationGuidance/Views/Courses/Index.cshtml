@@ -53,14 +53,15 @@
                         type: 'POST',
                         data: { university: university, courseName: courseName },
                         success: function (result) {
-                            messageDiv.removeClass('alert-info').addClass(result.success ? 'alert-success' : 'alert-danger');
-                            messageDiv.text(result.message);
+                            messageDiv.removeClass('alert-info alert-success alert-danger')
+                                .addClass(result.success ? 'alert-success' : 'alert-warning')
+                                .text(result.message);
                         },
                         error: function (xhr, status, error) {
                             console.error('AJAX Error:', status, error);
-                            console.log('Response:', xhr.responseText);
-                            messageDiv.removeClass('alert-info').addClass('alert-danger');
-                            messageDiv.text('An error occurred while checking qualification. Please try again later.');
+                            messageDiv.removeClass('alert-info alert-success alert-danger')
+                                .addClass('alert-danger')
+                                .text('Error checking eligibility. Please try again.');
                         }
                     });
                 });

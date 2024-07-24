@@ -8,25 +8,28 @@
                 <h5 class="card-title">@course.CourseName</h5>
                 <h6 class="card-subtitle mb-2 text-muted">@course.University</h6>
                 <p class="card-text">Required Points: @course.Points</p>
-                <h6>Required Subjects:</h6>
-                <ul>
+
+                <h6 class="mt-3">Required Subjects:</h6>
+                <ul class="list-unstyled">
                     @foreach (var subject in course.SubjectRequired)
                     {
-                        <li>@subject.Subject.Name (Level @subject.SubjectLevel)</li>
+                        <li><small>@subject.Subject.Name (Level @subject.SubjectLevel)</small></li>
                     }
                 </ul>
+
                 @if (course.AlternativeSubjects.Any())
                 {
-                    <h6>Other Required subjects:</h6>
-                    <ul>
+                    <h6 class="mt-3">Alternative Subjects (at least one):</h6>
+                    <ul class="list-unstyled">
                         @foreach (var altSubject in course.AlternativeSubjects)
                         {
-                            @* <li>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</li> *@
+                            <li><small>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</small></li>
                         }
                     </ul>
                 }
-                <div id="eligibilityMessage_@course.CourseId" class="alert alert-info mt-3">
-                    Check your eligibility for this course.
+
+                <div id="eligibilityMessage_@course.CourseId" class="mt-3">
+                    <!-- Eligibility message will be inserted here -->
                 </div>
                 <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })" class="btn btn-primary mt-2">View more details</a>
             </div>
