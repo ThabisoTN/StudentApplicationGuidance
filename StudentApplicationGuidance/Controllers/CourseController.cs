@@ -153,6 +153,8 @@ namespace StudentApplicationGuidance.Controllers
             }
         }
 
+
+
         [HttpGet]
         public async Task<IActionResult> CheckQualification(string university, string courseName)
         {
