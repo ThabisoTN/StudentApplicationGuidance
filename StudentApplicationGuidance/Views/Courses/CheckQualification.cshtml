@@ -16,7 +16,11 @@
             {
                 <div class="alert alert-success">
                     <h4 class="alert-heading">Congratulations!</h4>
-                    <p>Congratulations! Based on your selected subjects and levels, you meet all the necessary requirements and qualify for this course. We are confident that your academic background and achievements make you a strong candidate for success in this program. Welcome aboard and we look forward to supporting you on your educational journey!.</p>
+                    <p>
+                        Based on your selected subjects and levels, you meet all the necessary requirements and qualify for this course. We are confident that your academic background and achievements make you a strong candidate for success in this program!
+
+                        We strongly encourage you to apply for this course. It's a fantastic opportunity to further your education and pursue your passions. With your dedication and hard work, we believe you will excel and achieve great things. Don't hesitate—take the next step in your academic journey and apply today!.
+                    </p>
                 </div>
             }
             else
@@ -62,7 +66,7 @@
             </ul>
             @if (Model.Course.AlternativeSubjects.Any())
             {
-                <h6>Alternative Subjects (You need at least one):</h6>
+                <h6>English (Home Language or First Additional Language) is required, along with at least one additional subject:</h6>
                 <ul>
                     @foreach (var altSubject in Model.Course.AlternativeSubjects)
                     {
