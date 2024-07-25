@@ -18,14 +18,19 @@ namespace StudentApplicationGuidance.Services
             {
                 var userSubject = userSubjects.FirstOrDefault(us => us.SubjectId == requiredSubject.SubjectId);
                 
+
                 if (userSubject == null || userSubject.Level < requiredSubject.SubjectLevel)
                 {
                     reasons.Add($"You do not have required subject or Your level for {requiredSubject.Subject.Name} is bellow required level for this course,  Required level is: {requiredSubject.SubjectLevel},");
                 }
-               
-
-
+            
             }
+            // Check if the user has English Home Language or First Additional Language at Level 4
+            //bool hasEnglish = userSubjects.Any(us =>(us.Subject.Name == "English Home Language" || us.Subject.Name == "English First Additional Language") && us.Level >= 4);
+            //if (!hasEnglish)
+            //{
+            //    reasons.Add("You do not have English (Home Language or First Additional Language) at Level 4.");
+            //}
 
             // Checking if user has any of the altenative subjects. U
             if (alternativeSubjects.Any())

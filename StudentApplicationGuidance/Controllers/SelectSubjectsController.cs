@@ -78,6 +78,7 @@ namespace StudentApplicationGuidance.Controllers
                     bool hasEnglish = subjectIds.Contains(1) || subjectIds.Contains(2);
                     bool hasMath = subjectIds.Contains(3) || subjectIds.Contains(4);
                     bool hasZuluOrAfrikaans = subjectIds.Contains(5) || subjectIds.Contains(6) || subjectIds.Contains(7) || subjectIds.Contains(8);
+                    bool hasLifeOrientation = subjectIds.Contains(9);
 
                     string validationMessage = string.Empty;
 
@@ -93,6 +94,11 @@ namespace StudentApplicationGuidance.Controllers
                     {
                         validationMessage += "You must add either IsiZulu Home Language, IsiZulu First Additional Language, Afrikaans Home Language, or Afrikaans First Additional Language.\\n";
                     }
+                    if (!hasLifeOrientation)
+                    {
+                        validationMessage += "life orientation is compolsary!!!";
+                    }
+
 
                     if (!string.IsNullOrEmpty(validationMessage))
                     {

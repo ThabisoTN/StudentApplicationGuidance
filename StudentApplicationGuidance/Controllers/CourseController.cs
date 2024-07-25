@@ -34,12 +34,7 @@ namespace StudentApplicationGuidance.Controllers
         {
             var universities = await _context.Courses.Select(c => c.University).Distinct().OrderBy(u => u).ToListAsync();
 
-            var coursesQuery = _context.Courses
-                .Include(c => c.SubjectRequired)
-                    .ThenInclude(sr => sr.Subject)
-                .Include(c => c.AlternativeSubjects)
-                    .ThenInclude(asub => asub.Subject)
-                .AsQueryable();
+            var coursesQuery = _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).AsQueryable();
 
             if (!string.IsNullOrEmpty(university))
             {
@@ -91,10 +86,7 @@ namespace StudentApplicationGuidance.Controllers
                 return Json(new List<string>());
             }
 
-            var courses = await _context.Courses
-                .Where(c => c.University == university)
-                .Select(c => c.CourseName)
-                .ToListAsync();
+            var courses = await _context.Courses.Where(c => c.University == university).Select(c => c.CourseName).ToListAsync();
 
             return Json(courses);
         }
@@ -110,12 +102,7 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "University and course must be selected." });
                 }
 
-                var course = await _context.Courses
-                    .Include(c => c.SubjectRequired)
-                        .ThenInclude(sr => sr.Subject)
-                    .Include(c => c.AlternativeSubjects)
-                        .ThenInclude(asub => asub.Subject)
-                    .FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
+                var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
 
                 if (course == null)
                 {
@@ -128,10 +115,7 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "Please log in to check qualification." });
                 }
 
-                var userSubjects = await _context.UserSubjects
-                    .Where(us => us.UserId == userId)
-                    .Include(us => us.Subject)
-                    .ToListAsync();
+                var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
 
                 if (userSubjects == null || !userSubjects.Any())
                 {
@@ -163,12 +147,7 @@ namespace StudentApplicationGuidance.Controllers
                 return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
 
-            var course = await _context.Courses
-                .Include(c => c.SubjectRequired)
-                    .ThenInclude(sr => sr.Subject)
-                .Include(c => c.AlternativeSubjects)
-                    .ThenInclude(asub => asub.Subject)
-                .FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
+            var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
 
             if (course == null)
             {

@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Models;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using StudentApplicationGuidance.Data;
+
 
 
 namespace StudentApplicationGuidance.Data
@@ -59,9 +55,15 @@ namespace StudentApplicationGuidance.Data
             var courses = new Course[]
             {
                 new Course { University = "University of KwaZulu-Natal", CourseName = "B Sc Computer Science & Information Technology", Points = 34 },
-                //new Course { University = "Durban University of Technology", CourseName = "Bachelor of Information and Communications Technology", Points = 30 },
-                //new Course { University = "Mangosuthu University of Technology", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },
-                //new Course { University = "Mangosuthu University of Technology", CourseName = "Advanced Diploma in Information Technology", Points = 25 }
+                new Course { University = "Durban University of Technology", CourseName = "Bachelor of Information and Communications Technology", Points = 30 },
+                new Course { University = "Durban University of Technology", CourseName = "Dip ICT: Applications Development", Points = 26 },
+                new Course { University = "Durban University of Technology", CourseName = "Dip ICT: Applications Development (4 year Foundation programme)", Points = 26 },
+                new Course { University = "Durban University of Technology", CourseName = "Dip ICT: Business Analysis", Points = 26 },
+                new Course { University = "Mangosuthu University of Technology", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },
+                new Course{University="Mangosuthu University of Technology", CourseName="Diploma in Information Technology", Points=24},
+                new Course { University = "Mangosuthu University of Technology", CourseName = "Advanced Diploma in Information Technology", Points = 25 },
+                new Course { University = "Durban University of Technology", CourseName = "Bachelor of Information and Communications Technology in Internet of Things (IoT)", Points = 28 }
+
             };
 
             context.Courses.AddRange(courses);
@@ -77,8 +79,14 @@ namespace StudentApplicationGuidance.Data
                 new SubjectRequired {SubjectId=3, CourseId=1, SubjectLevel=5},
                 new SubjectRequired {SubjectId=9,CourseId=1, SubjectLevel=4},
 
-               
-                
+                //second course
+                new SubjectRequired{SubjectId=3,CourseId=2, SubjectLevel=4},
+                new SubjectRequired{SubjectId=9, CourseId=2, SubjectLevel=4}
+
+
+
+
+                             
             };
 
             context.SubjectRequireds.AddRange(subjectRequired);
@@ -91,13 +99,38 @@ namespace StudentApplicationGuidance.Data
             var alternativeSubjects = new AlternativeSubject[]
             {
                 //First Course
+                new AlternativeSubject{SubjectId=1,CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="English Home Language"},
+                new AlternativeSubject{SubjectId=2, CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="English First Additional Language"},
                 new AlternativeSubject {SubjectId=19, CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="Gricultural Science"},
                 new AlternativeSubject{SubjectId=11,CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="Life Science"}, 
                 new AlternativeSubject{ SubjectId=10,CourseId=1, AlternativeSubjectLevel =4, AlternativeSubjectName="Physical Science"},
-                new AlternativeSubject{SubjectId=1,CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="English Home Language"}, 
-                new AlternativeSubject{SubjectId=2, CourseId=1, AlternativeSubjectLevel=4, AlternativeSubjectName="English First Additional Language"},
+               
 
-             
+                //second course
+               new AlternativeSubject { SubjectId = 1, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English Home Language" },
+                new AlternativeSubject { SubjectId = 2, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
+                new AlternativeSubject { SubjectId = 19, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Science" },
+                new AlternativeSubject { SubjectId = 11, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Life Sciences" },
+                new AlternativeSubject { SubjectId = 10, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Physical Science" },
+                new AlternativeSubject { SubjectId = 3, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Geography" },
+                new AlternativeSubject { SubjectId = 4, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "History" },
+                new AlternativeSubject { SubjectId = 5, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Accounting" },
+                new AlternativeSubject { SubjectId = 6, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Business Studies" },
+                new AlternativeSubject { SubjectId = 7, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Economics" },
+                new AlternativeSubject { SubjectId = 8, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Information Technology" },
+                new AlternativeSubject { SubjectId = 9, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Computer Applications Technology" },
+                new AlternativeSubject { SubjectId = 12, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Technology" },
+                new AlternativeSubject { SubjectId = 13, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Management Practices" },
+                new AlternativeSubject { SubjectId = 14, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Tourism" },
+                new AlternativeSubject { SubjectId = 15, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Hospitality Studies" },
+                new AlternativeSubject { SubjectId = 16, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Consumer Studies" },
+                new AlternativeSubject { SubjectId = 17, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Engineering Graphics and Design" },
+                new AlternativeSubject { SubjectId = 18, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Visual Arts" },
+                new AlternativeSubject { SubjectId = 20, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dance Studies" },
+                new AlternativeSubject { SubjectId = 21, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Design" },
+                new AlternativeSubject { SubjectId = 22, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dramatic Arts" },
+                new AlternativeSubject { SubjectId = 23, CourseId = 2, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Music" }
+
 
             };
 
