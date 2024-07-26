@@ -39,6 +39,7 @@ namespace StudentApplicationGuidance
             builder.Services.AddScoped<SubjectService>(); // Example for SubjectServices
             builder.Services.AddScoped<UserSubjectService>(); // Example for UserSubjectService
             builder.Services.AddScoped<CourseQualificationService>();
+            builder.Services.AddScoped<TutorAIService>();
             
 
             // Controllers and Views configuration

@@ -29,7 +29,6 @@
                         @if (course.AlternativeSubjects.Count() > 5)
                         {
                             <li><strong>... and other designated subjects</strong></li>
-
                         }
                     </ul>
                 }
@@ -38,7 +37,34 @@
                     <!-- Eligibility message will be inserted here -->
                 </div>
                 <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })" class="btn btn-primary mt-2">View more details</a>
+
+                <div id="careerAdvice_@course.CourseId" class="mt-3">
+                    <!-- Career advice will be inserted here -->
+                </div>
+                <button class="btn btn-secondary mt-2" onclick="loadCareerAdvice(@course.CourseId)">Get Career Advice</button>
             </div>
         </div>
     </div>
+}
+
+@section Scripts {
+    <script>
+        function loadCareerAdvice(courseId) {
+            $.ajax({
+                url: '@Url.Action("GetCareerAdvice", "Courses")',
+                type: 'GET',
+                data: { courseIds: [courseId] },
+                success: function (response) {
+                    if (response.success) {
+                        $('#careerAdvice_' + courseId).html('<p>' + response.advice + '</p>');
+                    } else {
+                        $('#careerAdvice_' + courseId).html('<p>' + response.message + '</p>');
+                    }
+                },
+                error: function () {
+                    $('#careerAdvice_' + courseId).html('<p>An error occurred while loading career advice. Please try again.</p>');
+                }
+            });
+        }
+    </script>
 }
