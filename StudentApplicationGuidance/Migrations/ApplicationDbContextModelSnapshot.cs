@@ -17,7 +17,7 @@ namespace StudentApplicationGuidance.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -533,11 +533,6 @@ namespace StudentApplicationGuidance.Migrations
 
                     b.Navigation("SubjectRequired");
 
-                    b.Navigation("UserSubjects");
-                });
-
-            modelBuilder.Entity("StudentApplicationGuidance.Models.Course", b =>
-                {
                     b.Navigation("UserSubjects");
                 });
 
