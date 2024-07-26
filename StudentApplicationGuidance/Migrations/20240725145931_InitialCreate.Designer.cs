@@ -12,15 +12,15 @@ using StudentApplicationGuidance.Data;
 namespace StudentApplicationGuidance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240717125223_initialcreate")]
-    partial class initialcreate
+    [Migration("20240725145931_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -213,13 +213,14 @@ namespace StudentApplicationGuidance.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FundingSourceId")
+                        .HasColumnType("int");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -244,18 +245,11 @@ namespace StudentApplicationGuidance.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Province")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("ProvinceId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SourceOfFunding")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -266,6 +260,8 @@ namespace StudentApplicationGuidance.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FundingSourceId");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -274,7 +270,43 @@ namespace StudentApplicationGuidance.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("ProvinceId");
+
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("StudentApplicationGuidance.Data.FundingSource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FundingSources");
+                });
+
+            modelBuilder.Entity("StudentApplicationGuidance.Data.Province", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Provinces");
                 });
 
             modelBuilder.Entity("StudentApplicationGuidance.Data.Subject", b =>
@@ -441,6 +473,25 @@ namespace StudentApplicationGuidance.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("StudentApplicationGuidance.Data.ApplicationUser", b =>
+                {
+                    b.HasOne("StudentApplicationGuidance.Data.FundingSource", "FundingSource")
+                        .WithMany()
+                        .HasForeignKey("FundingSourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentApplicationGuidance.Data.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FundingSource");
+
+                    b.Navigation("Province");
+                });
+
             modelBuilder.Entity("StudentApplicationGuidance.Data.SubjectRequired", b =>
                 {
                     b.HasOne("StudentApplicationGuidance.Models.Course", "Course")
@@ -469,7 +520,7 @@ namespace StudentApplicationGuidance.Migrations
                         .IsRequired();
 
                     b.HasOne("StudentApplicationGuidance.Data.ApplicationUser", "User")
-                        .WithMany("UserSubjects")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -477,11 +528,6 @@ namespace StudentApplicationGuidance.Migrations
                     b.Navigation("Subject");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("StudentApplicationGuidance.Data.ApplicationUser", b =>
-                {
-                    b.Navigation("UserSubjects");
                 });
 
             modelBuilder.Entity("StudentApplicationGuidance.Data.Subject", b =>

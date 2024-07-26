@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Models;
 
+
 namespace StudentApplicationGuidance.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
