@@ -18,6 +18,10 @@
     @await Html.PartialAsync("_CourseCards", Model.Courses)
 </div>
 
+<div class="row" id="courseCardsContainer">
+    @await Html.PartialAsync("_CourseCards", Model.Courses)
+</div>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -66,6 +70,24 @@ function checkEligibility() {
         });
     });
 }
+
+            function loadCareerAdvice(courseId) {
+                $.ajax({
+                    url: '@Url.Action("GetCareerAdvice", "Courses")',
+                    type: 'GET',
+                    data: { courseIds: [courseId] },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#careerAdvice_' + courseId).html('<p>' + response.advice + '</p>');
+                        } else {
+                            $('#careerAdvice_' + courseId).html('<p>' + response.message + '</p>');
+                        }
+                    },
+                    error: function () {
+                        $('#careerAdvice_' + courseId).html('<p>An error occurred while loading career advice. Please try again.</p>');
+                    }
+                });
+            }
 
             // Initial eligibility check
             checkEligibility();

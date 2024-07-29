@@ -139,14 +139,22 @@ namespace StudentApplicationGuidance.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            ProvinceOptions = await _context.Provinces
-                  .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name })
-                  .ToListAsync();
+            var provinces = await _context.Provinces.ToListAsync();
+            var fundingSources = await _context.FundingSources.ToListAsync();
 
-            FundingSourceOptions = await _context.FundingSources
+            Console.WriteLine($"Number of provinces: {provinces.Count}");
+            Console.WriteLine($"Number of funding sources: {fundingSources.Count}");
+
+            ProvinceOptions = provinces
+                .Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name })
+                .ToList();
+
+            FundingSourceOptions = fundingSources
                 .Select(f => new SelectListItem { Value = f.Id.ToString(), Text = f.Name })
-                .ToListAsync();
+                .ToList();
 
+            Console.WriteLine($"Number of province options: {ProvinceOptions.Count}");
+            Console.WriteLine($"Number of funding source options: {FundingSourceOptions.Count}");
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)

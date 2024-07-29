@@ -29,15 +29,27 @@
                         @if (course.AlternativeSubjects.Count() > 4)
                         {
                             <li><strong>... and other designated subjects</strong></li>
-
                         }
                     </ul>
                 }
 
-                <div id="eligibilityMessage_@course.CourseId" class="mt-3">
-                    <!-- Eligibility message will be inserted here -->
+                <!-- Eligibility Message Section -->
+                <div id="eligibilityMessage_@course.CourseId" class="mt-3 p-3 border rounded bg-light">
+                    <h6 class="mb-2">Eligibility Message</h6>
+                    <p><!-- Eligibility message will be inserted here --></p>
                 </div>
-                <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })" class="btn btn-primary mt-2">View more details</a>
+@* 
+                <!-- Career Advice Section -->
+                <div id="careerAdvice_@course.CourseId" class="mt-3 p-3 border rounded bg-light">
+                    <h6 class="mb-2">Career Advice</h6>
+                    <p><!-- Career advice will be inserted here --></p>
+                </div> *@
+
+                <a href="@Url.Action("CheckQualification", "Courses", new { university = course.University, courseName = course.CourseName })"
+                   class="btn btn-primary mt-2"
+                   onclick="loadCareerAdvice(@course.CourseId); return false;">
+                    View more details
+                </a>
             </div>
         </div>
     </div>

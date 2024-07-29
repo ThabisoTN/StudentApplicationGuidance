@@ -12,7 +12,7 @@ using StudentApplicationGuidance.Data;
 namespace StudentApplicationGuidance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240725145931_InitialCreate")]
+    [Migration("20240729074158_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -364,6 +364,11 @@ namespace StudentApplicationGuidance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
@@ -494,7 +499,7 @@ namespace StudentApplicationGuidance.Migrations
 
             modelBuilder.Entity("StudentApplicationGuidance.Data.SubjectRequired", b =>
                 {
-                    b.HasOne("StudentApplicationGuidance.Models.Course", "Course")
+                    b.HasOne("StudentApplicationGuidance.Models.Course", null)
                         .WithMany("SubjectRequired")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -505,8 +510,6 @@ namespace StudentApplicationGuidance.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Course");
 
                     b.Navigation("Subject");
                 });

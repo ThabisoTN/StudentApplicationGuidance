@@ -171,11 +171,11 @@ namespace StudentApplicationGuidance.Data
                 new SubjectRequired{SubjectId=9, CourseId=1, SubjectLevel=4,/*SubjectName="Life Orientation"*/ },
 
                // Required subjects for Bachelor of Information and Communications Technology at DUT
-               new SubjectRequired { SubjectId = 3, CourseId = 2, SubjectLevel = 4,/*SubjectName = "Mathematics"*/ }, 
+               new SubjectRequired { SubjectId = 3, CourseId = 2, SubjectLevel = 4,/*SubjectName = "Mathematics"*/ },
                new SubjectRequired{SubjectId=9, CourseId=2, SubjectLevel=4, /*SubjectName="Life Orientation"*/ },
                        
                //BACHELOR OF INFORMATION AND COMMUNICATION TECHNOLOGY IN IOT
-               new SubjectRequired { SubjectId = 3, CourseId = 3, SubjectLevel = 4, /*SubjectName="Mathematics"*/ }, 
+               new SubjectRequired { SubjectId = 3, CourseId = 3, SubjectLevel = 4, /*SubjectName="Mathematics"*/ },
                new SubjectRequired{SubjectId=9, CourseId=3, SubjectLevel=4, /*SubjectName="Life Orientation"*/ },
                
                // Required subjects for Dip ICT: Applications Development at DUT
@@ -191,9 +191,9 @@ namespace StudentApplicationGuidance.Data
                new SubjectRequired{SubjectId=9, CourseId=7, SubjectLevel=4, /*SubjectName="Life Orientation"*/},
                
                // Required subjects for Diploma in Information Technology (ECP) at MUT 
-               new SubjectRequired { SubjectId = 9, CourseId = 8, SubjectLevel = 4 , /*SubjectName="Life Orientation"*/}, 
-               
-               
+               new SubjectRequired { SubjectId = 9, CourseId = 8, SubjectLevel = 4 , /*SubjectName="Life Orientation"*/},
+
+
             };
 
             context.SubjectRequireds.AddRange(subjectRequired);
@@ -268,7 +268,7 @@ namespace StudentApplicationGuidance.Data
                 new AlternativeSubject { SubjectId = 1, CourseId = 4, AlternativeSubjectLevel = 3, AlternativeSubjectName = "English Home Language" },
                 new AlternativeSubject { SubjectId = 2, CourseId = 4, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
                 new AlternativeSubject {SubjectId=3, CourseId=4, AlternativeSubjectLevel=3, AlternativeSubjectName="Mathematic"},
-                new AlternativeSubject {SubjectId=4, CourseId=4, AlternativeSubjectLevel=6, AlternativeSubjectName="Mathematic literacy"}, 
+                new AlternativeSubject {SubjectId=4, CourseId=4, AlternativeSubjectLevel=6, AlternativeSubjectName="Mathematic literacy"},
                 new AlternativeSubject { SubjectId = 19, CourseId = 4, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Agricultural Science" },
                 new AlternativeSubject { SubjectId = 11, CourseId = 4, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Life Sciences" },
                 new AlternativeSubject { SubjectId = 10, CourseId = 4, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Physical Science" },
@@ -345,7 +345,7 @@ namespace StudentApplicationGuidance.Data
                 new AlternativeSubject { SubjectId = 21, CourseId = 6, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Design" },
                 new AlternativeSubject { SubjectId = 22, CourseId = 6, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Dramatic Arts" },
                 new AlternativeSubject { SubjectId = 23, CourseId = 6, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Music" },
-                
+
                 new AlternativeSubject { SubjectId = 1, CourseId = 7, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English Home Language" },
                 new AlternativeSubject { SubjectId = 2, CourseId = 7, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
                 new AlternativeSubject{SubjectId=3, CourseId=7, AlternativeSubjectLevel=3, AlternativeSubjectName="Mathematic"},
@@ -364,10 +364,10 @@ namespace StudentApplicationGuidance.Data
                 new AlternativeSubject { SubjectId = 2, CourseId = 8, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
                 new AlternativeSubject { SubjectId = 3, CourseId = 8, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematic" },
                 new AlternativeSubject { SubjectId = 4, CourseId = 8, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematic literacy" },
-       
 
-  
-           
+
+
+
             };
 
             // Check if the alternative subjects already exist before adding them to avoid duplicates
@@ -384,7 +384,7 @@ namespace StudentApplicationGuidance.Data
 
 
 
-    
+
 
 
 

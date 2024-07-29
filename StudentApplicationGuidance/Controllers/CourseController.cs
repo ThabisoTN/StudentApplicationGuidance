@@ -18,6 +18,7 @@ namespace StudentApplicationGuidance.Controllers
     public class CoursesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly TutorAIService _tutorAIService;
         private readonly CourseQualificationService _qualificationService;
         private readonly ILogger<CoursesController> _logger;
 
@@ -173,6 +174,21 @@ namespace StudentApplicationGuidance.Controllers
             };
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCareerAdvice([FromQuery] List<int> courseIds)
+        {
+            try
+            {
+                var careerAdvice = await _tutorAIService.GenerateCareerAdviceAsync(courseIds);
+                return Json(new { success = true, advice = careerAdvice });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating career advice for courseIds: {CourseIds}", courseIds);
+                return Json(new { success = false, message = "An error occurred while generating career advice. Please try again." });
+            }
         }
 
 
