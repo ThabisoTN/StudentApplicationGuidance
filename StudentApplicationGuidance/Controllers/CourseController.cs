@@ -22,13 +22,17 @@ namespace StudentApplicationGuidance.Controllers
         private readonly CourseQualificationService _qualificationService;
         private readonly ILogger<CoursesController> _logger;
 
-        public CoursesController(ApplicationDbContext context, CourseQualificationService qualificationService, ILogger<CoursesController> logger)
+        public CoursesController(
+            ApplicationDbContext context,
+            TutorAIService tutorAIService,
+            CourseQualificationService qualificationService,
+            ILogger<CoursesController> logger)
         {
             _context = context;
+            _tutorAIService = tutorAIService;
             _qualificationService = qualificationService;
             _logger = logger;
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Index(string university)
@@ -161,7 +165,7 @@ namespace StudentApplicationGuidance.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var userSubjects = await _context.UserSubjects .Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
+            var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
 
             var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
@@ -177,20 +181,34 @@ namespace StudentApplicationGuidance.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCareerAdvice([FromQuery] List<int> courseIds)
+        public async Task<IActionResult> GetCareerAdvice([FromQuery] int courseId)
         {
             try
             {
-                var careerAdvice = await _tutorAIService.GenerateCareerAdviceAsync(courseIds);
+                var course = await _context.Courses
+                    .Include(c => c.SubjectRequired)
+                    .ThenInclude(sr => sr.Subject)
+                    .Include(c => c.AlternativeSubjects)
+                    .ThenInclude(asub => asub.Subject)
+                    .FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+                if (course == null)
+                {
+                    return Json(new { success = false, message = "Course not found." });
+                }
+
+                // Create a list with a single course
+                var courses = new List<Course> { course };
+
+                var careerAdvice = await _tutorAIService.GenerateCareerAdviceAsync(courses);
                 return Json(new { success = true, advice = careerAdvice });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating career advice for courseIds: {CourseIds}", courseIds);
+                _logger.LogError(ex, "Error generating career advice for courseId: {CourseId}", courseId);
                 return Json(new { success = false, message = "An error occurred while generating career advice. Please try again." });
             }
         }
-
 
         //[HttpPost]
         //public async Task<IActionResult> CheckQualification(string university, string courseName)

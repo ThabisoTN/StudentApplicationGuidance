@@ -19,7 +19,7 @@
                     <p>
                         Based on your selected subjects and levels, you meet all the necessary requirements and qualify for this course. We are confident that your academic background and achievements make you a strong candidate for success in this program!
 
-                        We strongly encourage you to apply for this course. It's a fantastic opportunity to further your education and pursue your passions. With your dedication and hard work, we believe you will excel and achieve great things. Don't hesitate—take the next step in your academic journey and apply today!.
+                        We strongly encourage you to apply for this course. It's a fantastic opportunity to further your education and pursue your passions. With your dedication and hard work, we believe you will excel and achieve great things. Don't hesitate—take the next step in your academic journey and apply today!
                     </p>
                 </div>
             }
@@ -92,8 +92,51 @@
                     }
                 </ul>
             }
+
+            <!-- Career Advice Section -->
+            <div id="careerAdvice" class="mt-4 p-3 border rounded bg-light">
+                <h5 class="mb-2">Career Advice</h5>
+                <div id="careerAdviceSpinner" class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div id="careerAdviceContent" style="display: none;"></div>
+            </div>
         </div>
     </div>
 
     <a href="@Url.Action("Index", "Courses")" class="btn btn-primary mt-4">Back to Course List</a>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            generateCareerAdvice(@Model.Course.CourseId);
+        });
+
+        function generateCareerAdvice(courseId) {
+            const spinner = document.getElementById('careerAdviceSpinner');
+            const content = document.getElementById('careerAdviceContent');
+
+            spinner.style.display = 'inline-block';
+            content.style.display = 'none';
+
+            fetch(`/Courses/GetCareerAdvice?courseId=${courseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    spinner.style.display = 'none';
+                    content.style.display = 'block';
+                    if (data.success) {
+                        content.innerHTML = data.advice;
+                    } else {
+                        content.innerHTML = 'Error loading career advice. Please try again.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    spinner.style.display = 'none';
+                    content.style.display = 'block';
+                    content.innerHTML = 'Error loading career advice. Please try again.';
+                });
+        }
+    </script>
+}
