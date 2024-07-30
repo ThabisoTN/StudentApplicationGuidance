@@ -93,7 +93,6 @@
                 </ul>
             }
 
-            <!-- Career Advice Section -->
             <div id="careerAdvice" class="mt-4 p-3 border rounded bg-light">
                 <h5 class="mb-2">Career Advice</h5>
                 <div id="careerAdviceSpinner" class="spinner-border text-primary" role="status">
@@ -126,7 +125,7 @@
                     spinner.style.display = 'none';
                     content.style.display = 'block';
                     if (data.success) {
-                        content.innerHTML = data.advice;
+                        content.innerHTML = data.advice; // This will now include clickable links
                     } else {
                         content.innerHTML = 'Error loading career advice. Please try again.';
                     }

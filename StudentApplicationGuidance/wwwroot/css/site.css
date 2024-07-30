@@ -29,7 +29,7 @@ footer {
     padding: 1rem 0;
     margin-top: auto;
     width: 100%;
-    position: fixed;
+   
     bottom: 0;
     left: 0;
 }
@@ -133,6 +133,9 @@ footer {
         border-color: var(--dark-blue);
         transform: translateY(-2px);
     }
+.navbar {
+    margin-bottom: 20px; /* Adjust this value based on your needs */
+}
 
 .btn-secondary {
     background-color: var(--yellow);

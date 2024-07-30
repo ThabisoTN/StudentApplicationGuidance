@@ -38,28 +38,38 @@ namespace StudentApplicationGuidance.Services
                 chat.AppendUserInput(prompt);
 
                 string response = await chat.GetResponseFromChatbotAsync();
-                return response;
+                // Convert the plain text response into a structured HTML format
+                string htmlResponse = FormatResponseToHtml(response);
+                return htmlResponse;
             }
             catch (Exception ex)
             {
-                // Log the exception
                 Console.WriteLine($"Error generating career advice: {ex.Message}");
                 return "An error occurred while generating career advice. Please try again later.";
             }
         }
 
+        private string FormatResponseToHtml(string response)
+        {
+            // This is a simplified example. You might need a more sophisticated parsing based on the actual response structure.
+            // Split the response into paragraphs and list items for potential career paths.
+            var paragraphs = response.Split('\n').Select(p => $"<p>{p}</p>").ToArray();
+            var htmlResponse = string.Join("", paragraphs);
+            return htmlResponse;
+        }
         private string BuildCareerAdvicePrompt(List<Course> courses)
         {
-            var prompt = "Based on the following courses, provide career guidance and example careers one would undertake after completing these courses. Use Ithala Bank as an example of where they can work:\n\n";
+            var prompt = "Based on the following courses, provide career guidance and example careers one would undertake after completing these courses. Use Ithala Bank as an example of where they can work:<br><br>";
             foreach (var course in courses)
             {
-                prompt += $"Course: {course.CourseName}\nUniversity: {course.University}\n";
-                prompt += "Required Subjects:\n";
+                prompt += $"<b>Course:</b> {course.CourseName}<br>";
+                prompt += $"<b>University:</b> {course.University}<br>";
+                prompt += "<b>Required Subjects:</b><ul>";
                 foreach (var subject in course.SubjectRequired)
                 {
-                    prompt += $"- {subject.Subject.Name} (Level {subject.SubjectLevel})\n";
+                    prompt += $"<li>- {subject.Subject.Name} (Level {subject.SubjectLevel})</li>";
                 }
-                prompt += "\n";
+                prompt += "</ul><br>";
             }
             prompt += "Please provide detailed career advice and example careers based on these courses.";
             return prompt;
