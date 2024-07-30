@@ -34,12 +34,16 @@ namespace StudentApplicationGuidance.Controllers
             _logger = logger;
         }
 
+
         [HttpGet]
         public async Task<IActionResult> Index(string university)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var universities = await _context.Courses.Select(c => c.University).Distinct().OrderBy(u => u).ToListAsync();
 
-            var coursesQuery = _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).AsQueryable();
+            var coursesQuery = _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject)
+                                                .AsQueryable();
 
             if (!string.IsNullOrEmpty(university))
             {
@@ -48,21 +52,23 @@ namespace StudentApplicationGuidance.Controllers
 
             var courses = await coursesQuery.ToListAsync();
 
+            var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
+
             var viewModel = new CourseListViewModel
             {
                 Courses = courses,
                 Universities = universities,
-                SelectedUniversity = university
+                SelectedUniversity = university,
+                UserSubjects = userSubjects // Populate this property
             };
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                return PartialView("_CourseCards", courses);
+                return PartialView("_CourseCards", viewModel);
             }
 
             return View(viewModel);
         }
-
 
 
         [HttpGet]
@@ -180,6 +186,7 @@ namespace StudentApplicationGuidance.Controllers
             return View(viewModel);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetCareerAdvice([FromQuery] int courseId)
         {
@@ -210,54 +217,6 @@ namespace StudentApplicationGuidance.Controllers
             }
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CheckQualification(string university, string courseName)
-        //{
-        //    if (string.IsNullOrEmpty(university) || string.IsNullOrEmpty(courseName))
-        //    {
-        //        return Json(new { success = false, message = "University and course must be selected." });
-        //    }
-
-        //    var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
-
-        //    if (course == null)
-        //    {
-        //        return Json(new { success = false, message = "Course not found." });
-        //    }
-
-        //    var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    if (string.IsNullOrEmpty(userId))
-        //    {
-        //        return Json(new { success = false, message = "User not logged in, login required." });
-        //    }
-
-        //    try
-        //    {
-
-        //        var userSubjects = await _context.UserSubjects
-        //            .Where(us => us.UserId == userId)
-        //            .Include(us => us.Subject)
-        //            .ToListAsync();
-
-        //        if (userSubjects == null || !userSubjects.Any())
-        //        {
-        //            return Json(new { success = false, message = "User does not have subjects. Please save subjects to the system." });
-        //        }
-
-        //        var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
-
-        //        string message = qualifies
-        //            ? "You qualify for the course. You can apply for it at the selected university."
-        //            : $"You do not meet the minimum requirements for this course. Reasons:\n{string.Join("\n", reasons)}";
-
-        //        return Json(new { success = qualifies, message = message });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error checking qualification");
-        //        return Json(new { success = false, message = $"Error checking qualification: {ex.Message}" });
-        //    }
-        //}
     }
 }
 

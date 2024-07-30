@@ -9,6 +9,7 @@ namespace StudentApplicationGuidance.ModelView
         public List<string> Universities { get; set; }
         public string SelectedUniversity { get; set; }
         public bool Qualifies { get; set; }
+        public List<UserSubject> UserSubjects { get; set; } // Add this property
     }
 
 }
