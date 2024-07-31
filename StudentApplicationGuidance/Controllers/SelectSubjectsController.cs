@@ -123,6 +123,97 @@ namespace StudentApplicationGuidance.Controllers
             return View(model);
         }
 
+
+
+        // GET: /SelectSubjects/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userSubject = await _context.UserSubjects
+                .Include(us => us.Subject)
+                .FirstOrDefaultAsync(us => us.Id == id && us.UserId == userId);
+
+            if (userSubject == null)
+            {
+                return NotFound();
+            }
+
+            var model = new SelectSubjectsView
+            {
+                Id = userSubject.Id,
+                Subject1 = userSubject.SubjectId, // Map to correct property
+                Subject1Level = userSubject.Level
+            };
+
+            ViewBag.Subjects = await _userSubjectService.GetAllSubjects();
+            return View(model);
+        }
+
+
+        // POST: /SelectSubjects/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, SelectSubjectsView model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var userSubject = await _context.UserSubjects
+                        .FirstOrDefaultAsync(us => us.Id == id && us.UserId == userId);
+
+                    if (userSubject == null)
+                    {
+                        return NotFound();
+                    }
+
+                    userSubject.Level = model.Subject1Level; // Adjust as needed
+
+                    _context.Update(userSubject);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Error updating subject: {ex.Message}");
+                }
+            }
+
+            // Reload subjects for the view
+            ViewBag.Subjects = await _userSubjectService.GetAllSubjects();
+            return View(model);
+        }
+
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userSubject = await _context.UserSubjects
+                .Include(us => us.Subject)
+                .FirstOrDefaultAsync(us => us.Id == id && us.UserId == userId);
+
+            if (userSubject == null)
+            {
+                return NotFound();
+            }
+
+            var model = new SelectSubjectsView
+            {
+                Id = userSubject.Id,
+                Subject1 = userSubject.SubjectId, // Map to correct property
+                Subject1Level = userSubject.Level
+            };
+
+            ViewBag.Subjects = await _userSubjectService.GetAllSubjects();
+            return View(model);
+        }
+
+
+
         //Retrieving user subject and level
         public async Task<IActionResult> Index()
         {

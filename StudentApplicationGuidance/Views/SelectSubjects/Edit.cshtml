@@ -1,0 +1,34 @@
+﻿@model StudentApplicationGuidance.ModelView.SelectSubjectsView
+
+@{
+    ViewBag.Title = "Edit Subject";
+}
+
+<h2>Edit Subject</h2>
+
+<h4>Edit the subject details below</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div class="form-group">
+                <label asp-for="Subject1" class="control-label"></label>
+                <select asp-for="Subject1" class="form-control" asp-items="ViewBag.Subjects"></select>
+                <span asp-validation-for="Subject1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Subject1Level" class="control-label"></label>
+                <input asp-for="Subject1Level" class="form-control" />
+                <span asp-validation-for="Subject1Level" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

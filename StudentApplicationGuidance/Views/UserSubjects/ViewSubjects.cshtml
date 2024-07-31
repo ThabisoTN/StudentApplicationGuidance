@@ -4,6 +4,7 @@
     ViewData["Title"] = "User Subjects";
 }
 <h1>User Subjects and Levels</h1>
+
 @if (Model != null && Model.Any())
 {
     <table class="table">
@@ -11,6 +12,7 @@
             <tr>
                 <th>Subject</th>
                 <th>Level</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -19,6 +21,16 @@
                 <tr>
                     <td>@userSubject.Subject.Name</td>
                     <td>@userSubject.Level</td>
+                    <td>
+                        <!-- Edit Button -->
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@userSubject.Id">Edit</a>
+
+                        <!-- Delete Form -->
+                        <form asp-action="Delete" asp-route-id="@userSubject.Id" method="post" style="display:inline;">
+                            <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this subject?');" />
+                            @Html.AntiForgeryToken()
+                        </form>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -29,7 +41,5 @@ else
     <p>No subjects found for the current user.</p>
 }
 
-@* <a asp-page="/Course/EnterCourseName">Go Check Course Eligibility</a> *@
-<a class="btn btn-success" asp-controller="Courses" asp-action="Index">Go Check Course Eligibility</a> <a class="btn btn-success" asp-controller="SelectSubjects" asp-action="Create">Add subjects</a>
-
-
+<a class="btn btn-success" asp-controller="Courses" asp-action="Index">Go Check Course Eligibility</a>
+<a class="btn btn-success" asp-controller="SelectSubjects" asp-action="Create">Add subjects</a>
