@@ -18,9 +18,6 @@
     @await Html.PartialAsync("_CourseCards", Model.Courses)
 </div>
 
-<div class="row" id="courseCardsContainer">
-    @await Html.PartialAsync("_CourseCards", Model.Courses)
-</div>
 
 @section Scripts {
     <script>
@@ -44,32 +41,29 @@
                     }
                 });
             }
-
-function checkEligibility() {
-    $('.card').each(function () {
-        var card = $(this);
-        var university = card.find('.card-subtitle').text().trim();
-        var courseName = card.find('.card-title').text().trim();
-        var messageDiv = card.find('[id^="eligibilityMessage_"]');
-
-        $.ajax({
-            url: '@Url.Action("CheckQualificationAjax", "Courses")',
-            type: 'POST',
-            data: { university: university, courseName: courseName },
-            success: function (result) {
-                messageDiv.removeClass('alert-info alert-success alert-danger')
-                    .addClass(result.success ? 'alert-success' : 'alert-danger') // Changed from 'alert-warning' to 'alert-danger'
-                    .text(result.message);
-            },
-            error: function (xhr, status, error) {
-                console.error('AJAX Error:', status, error);
-                messageDiv.removeClass('alert-info alert-success alert-danger')
-                    .addClass('alert-danger')
-                    .text('Error checking eligibility. Please try again.');
+            
+            function checkEligibility() {
+                $('.card').each(function () {
+                    var card = $(this);
+                    var university = card.find('.card-subtitle').text().trim();
+                    var courseName = card.find('.card-title').text().trim();
+                    var messageDiv = card.find('[id^="eligibilityMessage_"]');
+                    $.ajax({
+                        url: '@Url.Action("CheckQualificationAjax", "Courses")',
+                        type: 'POST',
+                        data: { university: university, courseName: courseName },
+                        success: function (result) {
+                            messageDiv.removeClass('alert-info alert-success alert-danger').addClass(result.success ? 'alert-success' : 'alert-danger').text(result.message);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX Error:', status, error);
+                            messageDiv.removeClass('alert-info alert-success alert-danger')
+                            .addClass('alert-danger')
+                            .text('Error checking eligibility. Please try again.');
+                        }
+                    });
+                });
             }
-        });
-    });
-}
 
             function loadCareerAdvice(courseId) {
                 $.ajax({

@@ -26,6 +26,7 @@
                     <ul class="list-unstyled">
                         @foreach (var altSubject in course.AlternativeSubjects.Take(5))
                         {
+
                             <li><small>@altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)</small></li>
                         }
 

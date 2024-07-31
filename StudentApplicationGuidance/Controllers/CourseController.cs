@@ -35,40 +35,33 @@ namespace StudentApplicationGuidance.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> Index(string university)
+        public IActionResult Index(string university)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var universities = await _context.Courses.Select(c => c.University).Distinct().OrderBy(u => u).ToListAsync();
-
-            var coursesQuery = _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject)
-                                                .AsQueryable();
+            var coursesQuery = _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).AsQueryable();
 
             if (!string.IsNullOrEmpty(university))
             {
                 coursesQuery = coursesQuery.Where(c => c.University == university);
             }
 
-            var courses = await coursesQuery.ToListAsync();
+            var courses = coursesQuery.ToList();
 
-            var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
-
-            var viewModel = new CourseListViewModel
+            var model = new CourseListViewModel
             {
                 Courses = courses,
-                Universities = universities,
+                Universities = _context.Courses.Select(c => c.University).Distinct().ToList(),
                 SelectedUniversity = university,
-                UserSubjects = userSubjects // Populate this property
+                UserSubjects = _context.UserSubjects.Include(us => us.Subject).Where(us => us.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)).ToList()
             };
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                return PartialView("_CourseCards", viewModel);
+                return PartialView("_CourseCards", model.Courses);
             }
 
-            return View(viewModel);
+            return View(model);
         }
+
 
 
         [HttpGet]
