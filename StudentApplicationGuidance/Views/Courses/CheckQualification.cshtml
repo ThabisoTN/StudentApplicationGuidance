@@ -39,16 +39,17 @@
 
             <h5 class="mt-4">Course Requirements:</h5>
             <p>Required Points: @Model.Course.Points</p>
+
             <h6>Required Subjects:</h6>
             <ul>
                 @foreach (var subject in Model.Course.SubjectRequired)
                 {
-                    <li>
-                        @subject.Subject.Name (Level @subject.SubjectLevel)
-                        @if (!Model.Qualifies && Model.UserSubjects.Any(us => us.Subject.Name == subject.Subject.Name))
-                        {
-                            var userSubject = Model.UserSubjects.First(us => us.Subject.Name == subject.Subject.Name);
-                            if (userSubject.Level < subject.SubjectLevel)
+                    var userSubject = Model.UserSubjects.FirstOrDefault(us => us.Subject.Name == subject.Subject.Name);
+                    if (userSubject != null)
+                    {
+                        <li>
+                            @subject.Subject.Name (Level @subject.SubjectLevel)
+                            @if (userSubject.Level < subject.SubjectLevel)
                             {
                                 <span class="text-danger"> - Your level (@userSubject.Level) is below the required level (@subject.SubjectLevel)</span>
                             }
@@ -56,26 +57,23 @@
                             {
                                 <span class="text-success"> - Requirement met</span>
                             }
-                        }
-                        else if (!Model.Qualifies)
-                        {
-                            <span class="text-danger"> - Subject not taken</span>
-                        }
-                    </li>
+                        </li>
+                    }
                 }
             </ul>
+
             @if (Model.Course.AlternativeSubjects.Any())
             {
                 <h6>English (Home Language or First Additional Language) is required, along with at least one additional subject:</h6>
                 <ul>
                     @foreach (var altSubject in Model.Course.AlternativeSubjects)
                     {
-                        <li>
-                            @altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)
-                            @if (!Model.Qualifies && Model.UserSubjects.Any(us => us.Subject.Name == altSubject.AlternativeSubjectName))
-                            {
-                                var userSubject = Model.UserSubjects.First(us => us.Subject.Name == altSubject.AlternativeSubjectName);
-                                if (userSubject.Level < altSubject.AlternativeSubjectLevel)
+                        var userSubject = Model.UserSubjects.FirstOrDefault(us => us.Subject.Name == altSubject.AlternativeSubjectName);
+                        if (userSubject != null)
+                        {
+                            <li>
+                                @altSubject.AlternativeSubjectName (Level @altSubject.AlternativeSubjectLevel)
+                                @if (userSubject.Level < altSubject.AlternativeSubjectLevel)
                                 {
                                     <span class="text-danger"> - Your level (@userSubject.Level) is below the required level (@altSubject.AlternativeSubjectLevel)</span>
                                 }
@@ -83,12 +81,8 @@
                                 {
                                     <span class="text-success"> - Requirement met</span>
                                 }
-                            }
-                            else if (!Model.Qualifies)
-                            {
-                                <span class="text-danger"> - Subject not taken</span>
-                            }
-                        </li>
+                            </li>
+                        }
                     }
                 </ul>
             }
@@ -96,7 +90,7 @@
             <div id="careerAdvice" class="mt-4 p-3 border rounded bg-light">
                 <h5 class="mb-2">Career Advice</h5>
                 <div id="careerAdviceSpinner" class="spinner-border text-primary" role="status">
-                    <span class="sr-only">.......</span>
+                    <span class="sr-only">Loading...</span>
                 </div>
                 <div id="careerAdviceContent" style="display: none;"></div>
             </div>

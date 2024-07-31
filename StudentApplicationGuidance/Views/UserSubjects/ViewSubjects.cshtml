@@ -3,10 +3,13 @@
 @{
     ViewData["Title"] = "User Subjects";
 }
+
 <h1>User Subjects and Levels</h1>
 
 @if (Model != null && Model.Any())
 {
+    int totalPoints = Model.Where(us => us.Subject.Name != "Life Orientation").Sum(us => us.Level);
+
     <table class="table">
         <thead>
             <tr>
@@ -35,6 +38,8 @@
             }
         </tbody>
     </table>
+
+    <h4>Total Points (excluding Life Orientation): @totalPoints</h4>
 }
 else
 {

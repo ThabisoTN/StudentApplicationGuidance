@@ -8,8 +8,6 @@ namespace StudentApplicationGuidance.Data
         public int SubjectId { get; set; }
         public Subject Subject { get; set; }
         public int CourseId { get; set; }
-       // public Course Course { get; set; }
-       //public String SubjectName {  get; set; }
         public int SubjectLevel { get; set; }
     }
 }
