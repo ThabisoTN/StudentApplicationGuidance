@@ -11,9 +11,7 @@ namespace StudentApplicationGuidance.Models
         public string CourseName { get; set; }
         public int Points { get; set; }
         [StringLength(500)]
-        public string? Description { get; set; } // Add this line
-
-
+        public string? Description { get; set; }
         public virtual ICollection<SubjectRequired> SubjectRequired { get; set; }
         public virtual ICollection<AlternativeSubject> AlternativeSubjects { get; set; }
 

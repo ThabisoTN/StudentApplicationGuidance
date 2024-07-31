@@ -123,12 +123,6 @@ namespace StudentApplicationGuidance.Controllers
             return View(model);
         }
 
-
-
-
-
-
-
         //Retrieving user subject and level
         public async Task<IActionResult> Index()
         {

@@ -150,9 +150,6 @@ namespace StudentApplicationGuidance.Data
            
                 new Course{University="Mangosuthu University of Technology", CourseName="Diploma in Information Technology", Points=24}, //C ID 7
                 new Course { University = "Mangosuthu University of Technology", CourseName = "Diploma in Information Technology (ECP)", Points = 23 },//C ID 8
-                //new Course { University = "Mangosuthu University of Technology", CourseName = "Advanced Diploma in Information Technology", Points = 25 }, //C ID 9
-               
-
             };
 
             context.Courses.AddRange(courses);
@@ -192,8 +189,6 @@ namespace StudentApplicationGuidance.Data
                
                // Required subjects for Diploma in Information Technology (ECP) at MUT 
                new SubjectRequired { SubjectId = 9, CourseId = 8, SubjectLevel = 4 , /*SubjectName="Life Orientation"*/},
-
-
             };
 
             context.SubjectRequireds.AddRange(subjectRequired);
@@ -364,10 +359,6 @@ namespace StudentApplicationGuidance.Data
                 new AlternativeSubject { SubjectId = 2, CourseId = 8, AlternativeSubjectLevel = 4, AlternativeSubjectName = "English First Additional Language" },
                 new AlternativeSubject { SubjectId = 3, CourseId = 8, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematic" },
                 new AlternativeSubject { SubjectId = 4, CourseId = 8, AlternativeSubjectLevel = 4, AlternativeSubjectName = "Mathematic literacy" },
-
-
-
-
             };
 
             // Check if the alternative subjects already exist before adding them to avoid duplicates
@@ -378,15 +369,7 @@ namespace StudentApplicationGuidance.Data
                     context.AlternativeSubjects.Add(altSubject);
                 }
             }
-
             context.SaveChanges();
         }
-
-
-
-
-
-
-
     }
 }

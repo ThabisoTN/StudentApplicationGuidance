@@ -3,9 +3,7 @@
 @{
     ViewData["Title"] = "User Subjects";
 }
-
 <h1>User Subjects and Levels</h1>
-
 @if (Model != null && Model.Any())
 {
     <table class="table">
@@ -32,6 +30,6 @@ else
 }
 
 @* <a asp-page="/Course/EnterCourseName">Go Check Course Eligibility</a> *@
-<a class="btn btn-success" asp-controller="Courses" asp-action="SelectCourse">Go Check Course Eligibility</a>
+<a class="btn btn-success" asp-controller="Courses" asp-action="Index">Go Check Course Eligibility</a> <a class="btn btn-success" asp-controller="SelectSubjects" asp-action="Create">Add subjects</a>
 
 
