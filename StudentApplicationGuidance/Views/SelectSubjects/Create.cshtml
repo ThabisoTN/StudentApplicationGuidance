@@ -1,16 +1,9 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Create";
+}
 
 @section Styles {
-    <style>
-        .error-popup {
-            color: #fff;
-            background-color: #dc3545;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none; /* Hidden by default */
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/selectSubjects.css" />
 }
 
 @section Scripts {
@@ -20,39 +13,65 @@
             if (validationMessage) {
                 $('#error-popup').text(validationMessage.replace(/\\n/g, '\n')).show();
             }
+
+            var subjectCount = 1;
+            $('.subject-group:not(:first)').hide();
+
+            $('#add-subject').click(function (e) {
+                e.preventDefault();
+                if (subjectCount < 7) {
+                    subjectCount++;
+                    $('.subject-group:nth-child(' + subjectCount + ')').slideDown().css('animation', 'fadeInUp 0.5s forwards');
+                    if (subjectCount === 7) {
+                        $(this).hide();
+                    }
+                }
+            });
+
+            $('.subject-group select').change(function () {
+                $(this).closest('.subject-group').addClass('active');
+            });
         });
     </script>
 }
 
+<h2>@ViewData["Title"]</h2>
+
 <div id="error-popup" class="error-popup"></div>
 
 <form asp-action="Create" method="post">
-    @for (int i = 1; i <= 7; i++)
-    {
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="Subject@(i)" class="form-label">Subject @(i):</label>
-                <select id="Subject@(i)" name="Subject@(i)" class="form-select">
-                    <option value="">Select Subject</option>
-                    @foreach (var subject in ViewBag.Subjects)
-                    {
-                        <option value="@subject.Id">@subject.Name</option>
-                    }
-                </select>
+    <div id="subjects-container">
+        @for (int i = 1; i <= 7; i++)
+        {
+            <div class="subject-group">
+                <h4>Subject @i</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="Subject@(i)" class="form-label">Subject:</label>
+                        <select id="Subject@(i)" name="Subject@(i)" class="form-select">
+                            <option value="">Select Subject</option>
+                            @foreach (var subject in ViewBag.Subjects)
+                            {
+                                <option value="@subject.Id">@subject.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="Subject@(i)Level" class="form-label">Level:</label>
+                        <select id="Subject@(i)Level" name="Subject@(i)Level" class="form-select">
+                            @for (int j = 1; j <= 7; j++)
+                            {
+                                <option value="@j">@j</option>
+                            }
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-                <label for="Subject@(i)Level" class="form-label">Level:</label>
-                <select id="Subject@(i)Level" name="Subject@(i)Level" class="form-select">
-                    @for (int j = 1; j <= 7; j++)
-                    {
-                        <option value="@j">@j</option>
-                    }
-                </select>
-            </div>
-        </div>
-    }
+        }
+    </div>
 
-    <div class="text-center">
-        <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="button-container">
+        <button id="add-subject" class="btn btn-warning add-subject-btn">Add Another Subject</button>
+        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
     </div>
 </form>
