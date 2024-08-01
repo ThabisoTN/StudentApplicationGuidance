@@ -52,7 +52,6 @@ namespace StudentApplicationGuidance.Controllers
 
                     if (existingSubjects)
                     {
-                        // User already has subjects, redirect to view subjects action
                         return RedirectToAction("ViewSubjects", "UserSubjects");
                     }
 
@@ -117,7 +116,6 @@ namespace StudentApplicationGuidance.Controllers
                 }
             }
 
-            // If we get here, something went wrong; redisplay the form with current model state
             var subjects = await _userSubjectService.GetAllSubjects();
             ViewBag.Subjects = subjects;
             return View(model);
