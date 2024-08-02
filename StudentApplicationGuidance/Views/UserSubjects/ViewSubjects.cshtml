@@ -25,14 +25,14 @@
                     <td>@userSubject.Subject.Name</td>
                     <td>@userSubject.Level</td>
                     <td>
-                        <!-- Edit Button -->
+                      @*   <!-- Edit Button -->
                         <a class="btn btn-warning" asp-action="Edit" asp-route-id="@userSubject.Id">Edit</a>
 
                         <!-- Delete Form -->
                         <form asp-action="Delete" asp-route-id="@userSubject.Id" method="post" style="display:inline;">
                             <input type="submit" value="Delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this subject?');" />
                             @Html.AntiForgeryToken()
-                        </form>
+                        </form> *@
 
                     </td>
                 </tr>
