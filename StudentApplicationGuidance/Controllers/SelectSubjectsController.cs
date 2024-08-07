@@ -47,16 +47,15 @@ namespace StudentApplicationGuidance.Controllers
                         return Unauthorized();
                     }
 
-                    // Check if the user already has subjects
-                    var existingSubjects = await _context.UserSubjects.AnyAsync(us => us.UserId == userId);
+                    // Get existing subjects for the user
+                    var existingUserSubjects = await _context.UserSubjects
+                        .Where(us => us.UserId == userId)
+                        .Select(us => us.SubjectId)
+                        .ToListAsync();
 
-                    if (existingSubjects)
-                    {
-                        return RedirectToAction("ViewSubjects", "UserSubjects");
-                    }
-
-                    var subjectIds = new List<int>();
+                    var subjectIds = new HashSet<int>(); // Use HashSet to avoid duplicates
                     var levels = new List<int>();
+                    var validationMessage = string.Empty;
 
                     for (int i = 1; i <= 7; i++)
                     {
@@ -68,7 +67,25 @@ namespace StudentApplicationGuidance.Controllers
 
                         if (!string.IsNullOrEmpty(subjectId) && level > 0)
                         {
-                            subjectIds.Add(int.Parse(subjectId)); // Ensure proper conversion
+                            int id = int.Parse(subjectId); // Ensure proper conversion
+
+                            // Check for duplicates within the list being added
+                            if (subjectIds.Contains(id))
+                            {
+                                TempData["ErrorMessage"] = $"Duplicate subject with ID {id} detected.";
+                           
+                                return RedirectToAction("Create");
+                            }
+
+                            // Check if the subject is already saved for the user
+                            if (existingUserSubjects.Contains(id))
+                            {
+                                TempData["ErrorMessage"] = $"Subject with ID {id} already exists.";
+                                validationMessage = "Subject already exist";
+                                return RedirectToAction("Create");
+                            }
+
+                            subjectIds.Add(id);
                             levels.Add(level);
                         }
                     }
@@ -78,8 +95,6 @@ namespace StudentApplicationGuidance.Controllers
                     bool hasMath = subjectIds.Contains(3) || subjectIds.Contains(4);
                     bool hasZuluOrAfrikaans = subjectIds.Contains(5) || subjectIds.Contains(6) || subjectIds.Contains(7) || subjectIds.Contains(8);
                     bool hasLifeOrientation = subjectIds.Contains(9);
-
-                    string validationMessage = string.Empty;
 
                     if (!hasEnglish)
                     {
@@ -95,18 +110,17 @@ namespace StudentApplicationGuidance.Controllers
                     }
                     if (!hasLifeOrientation)
                     {
-                        validationMessage += "life orientation is compolsary!!!";
+                        validationMessage += "Life orientation is compulsory!\\n";
                     }
-
 
                     if (!string.IsNullOrEmpty(validationMessage))
                     {
-                        ViewBag.ValidationMessage = validationMessage;
-                        ModelState.AddModelError("", "Validation errors occurred.");
+                        TempData["ValidationMessage"] = validationMessage;
                     }
                     else
                     {
-                        await _userSubjectService.AddUserSubjectsAsync(userId, subjectIds, levels);
+                        // Add user subjects
+                        await _userSubjectService.AddUserSubjectsAsync(userId, subjectIds.ToList(), levels);
                         return RedirectToAction("ViewSubjects", "UserSubjects");
                     }
                 }
@@ -116,12 +130,15 @@ namespace StudentApplicationGuidance.Controllers
                 }
             }
 
-            var subjects = await _userSubjectService.GetAllSubjects();
-            ViewBag.Subjects = subjects;
+            // If we got this far, something failed, redisplay form
+            ViewBag.Subjects = await _userSubjectService.GetAllSubjects();
             return View(model);
         }
 
-        //Retrieving user subject and level
+
+
+
+        // Retrieving user subjects and levels
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -129,7 +146,5 @@ namespace StudentApplicationGuidance.Controllers
 
             return View(userSubjects);
         }
-
-
     }
 }

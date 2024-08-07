@@ -1,5 +1,8 @@
-﻿@{
+﻿@model StudentApplicationGuidance.ModelView.SelectSubjectsView
+
+@{
     ViewData["Title"] = "Create";
+    var validationMessage = TempData["ValidationMessage"] as string;
 }
 
 @section Styles {
@@ -9,7 +12,8 @@
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function () {
-            var validationMessage = '@ViewBag.ValidationMessage';
+            // Display validation message
+            var validationMessage = '@validationMessage';
             if (validationMessage) {
                 $('#error-popup').text(validationMessage.replace(/\\n/g, '\n')).show();
             }
@@ -37,7 +41,7 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<div id="error-popup" class="error-popup"></div>
+<div id="error-popup" class="error-popup" style="display:none; color:red;"></div>
 
 <form asp-action="Create" method="post">
     <div id="subjects-container">
@@ -69,7 +73,7 @@
             </div>
         }
     </div>
- 
+
     <div class="button-container">
         <button id="add-subject" class="btn btn-warning add-subject-btn">Add Another Subject</button>
         <button type="submit" class="btn btn-primary submit-btn">Submit</button>
