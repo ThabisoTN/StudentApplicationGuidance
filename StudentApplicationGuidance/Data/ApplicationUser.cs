@@ -11,11 +11,8 @@ namespace StudentApplicationGuidance.Data
         public string LastName { get; set; }
         public int ProvinceId { get; set; }
         public int FundingSourceId { get; set; }
-
-        // Navigation properties
         public virtual Province Province { get; set; }
         public virtual FundingSource FundingSource { get; set; }
-        //public virtual ICollection<UserSubject> UserSubjects { get; set; }
 
     }
 }

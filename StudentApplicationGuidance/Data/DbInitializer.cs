@@ -46,8 +46,44 @@ namespace StudentApplicationGuidance.Data
             {
                 SeedFundingSources(context);
             }
+
+            //Seed university table
+            if(!context.universities.Any())
+            {
+                SeedUniversity(context);
+            }
         }
 
+        public static void SeedUniversity(ApplicationDbContext context)
+        {
+            // Check if any universities exist in the database
+            if (!context.universities.Any())
+            {
+                // Define the list of universities to seed
+                var universities = new University[]
+                {
+            new University { UniversityName = "University of Cape Town" },
+            new University { UniversityName = "University of the Witwatersrand" },
+            new University { UniversityName = "University of Pretoria" },
+            new University { UniversityName = "University of Stellenbosch" },
+            new University { UniversityName = "University of KwaZulu-Natal" },
+            new University { UniversityName = "University of Johannesburg" },
+            new University { UniversityName = "University of the Western Cape" },
+            new University { UniversityName = "North-West University" },
+            new University { UniversityName = "University of Limpopo" },
+            new University { UniversityName = "University of the Free State" },
+            new University { UniversityName = "University of Venda" },
+            new University { UniversityName = "Walter Sisulu University" },
+            new University { UniversityName = "Tshwane University of Technology" },
+            new University { UniversityName = "Cape Peninsula University of Technology" },
+            new University { UniversityName = "Durban University of Technology" }
+                };
+
+                // Add the universities to the context and save changes
+                context.universities.AddRange(universities);
+                context.SaveChanges();
+            }
+        }
 
 
         //User source of funding.
