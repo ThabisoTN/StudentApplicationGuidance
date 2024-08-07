@@ -27,7 +27,9 @@ namespace StudentApplicationGuidance.Controllers
             TutorAIService tutorAIService,
             CourseQualificationService qualificationService,
             ILogger<CoursesController> logger)
-        {
+
+
+         {
             _context = context;
             _tutorAIService = tutorAIService;
             _qualificationService = qualificationService;
