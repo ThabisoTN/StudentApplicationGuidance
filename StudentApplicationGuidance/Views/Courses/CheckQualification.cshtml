@@ -6,8 +6,8 @@
 }
 
 <div class="container mt-4">
-    <h2>@Model.Course.CourseName</h2>
-    <h4 class="text-muted">@Model.Course.University</h4>
+    <h2>@Model.Course?.CourseName</h2>
+    <h4 class="text-muted">@Model.Course?.University?.UniversityName</h4>
 
     <div class="card mt-4">
         <div class="card-body">
@@ -38,13 +38,13 @@
             }
 
             <h5 class="mt-4">Course Requirements:</h5>
-            <p>Required Points: @Model.Course.Points</p>
+            <p>Required Points: @Model.Course?.Points</p>
 
             <h6>Required Subjects:</h6>
             <ul>
-                @foreach (var subject in Model.Course.SubjectRequired)
+                @foreach (var subject in Model.Course?.SubjectRequired ?? Enumerable.Empty<StudentApplicationGuidance.Data.SubjectRequired>())
                 {
-                    var userSubject = Model.UserSubjects.FirstOrDefault(us => us.Subject.Name == subject.Subject.Name);
+                    var userSubject = Model.UserSubjects?.FirstOrDefault(us => us.Subject.Name == subject.Subject.Name);
                     if (userSubject != null)
                     {
                         <li>
@@ -62,13 +62,13 @@
                 }
             </ul>
 
-            @if (Model.Course.AlternativeSubjects.Any())
+            @if (Model.Course?.AlternativeSubjects?.Any() == true)
             {
                 <h6>English (Home Language or First Additional Language) is required, along with at least one additional subject:</h6>
                 <ul>
                     @foreach (var altSubject in Model.Course.AlternativeSubjects)
                     {
-                        var userSubject = Model.UserSubjects.FirstOrDefault(us => us.Subject.Name == altSubject.AlternativeSubjectName);
+                        var userSubject = Model.UserSubjects?.FirstOrDefault(us => us.Subject.Name == altSubject.AlternativeSubjectName);
                         if (userSubject != null)
                         {
                             <li>
@@ -103,10 +103,12 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            generateCareerAdvice(@Model.Course.CourseId);
+            generateCareerAdvice(@Model.Course?.CourseId ?? 0);
         });
 
         function generateCareerAdvice(courseId) {
+            if (courseId === 0) return;
+
             const spinner = document.getElementById('careerAdviceSpinner');
             const content = document.getElementById('careerAdviceContent');
 
