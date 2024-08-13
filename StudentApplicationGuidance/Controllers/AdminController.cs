@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Data;
 using StudentApplicationGuidance.Models;
 using StudentApplicationGuidance.Services;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 public class AdminController : Controller
 {
@@ -40,7 +44,7 @@ public class AdminController : Controller
         }
     }
 
-    //Get: admin/ViewUsers
+    // Get: /Admin/ViewUsers
     public async Task<IActionResult> ApplicationUsers()
     {
         try
@@ -55,21 +59,7 @@ public class AdminController : Controller
         }
     }
 
-    public async Task<IActionResult> University()
-    {
-        try
-        {
-            var university = await _context.universities.ToListAsync();
-            return View(university);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"An error occurred while retrieving Universities: {ex.Message}");
-            return View("Error");
-        }
-    }
-
-    //Get:Admin/Courses
+    // Get: /Admin/Courses
     public async Task<IActionResult> Courses()
     {
         try
@@ -77,62 +67,177 @@ public class AdminController : Controller
             var course = await _context.Courses.ToListAsync();
             return View(course);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError($"An error occurred while retrieving Course: {ex.Message}");
             return View("Error");
         }
     }
 
+    public IActionResult CreateCourse()
+    {
+        var viewModel = new CourseViewModel
+        {
+            Universities = _context.SAUniversities
+                .Select(u => new SelectListItem
+                {
+                    Value = u.Id.ToString(),
+                    Text = u.UniversityName
+                }).ToList(),
 
-    //// GET: /Admin/AddCourse
-    //public async Task<IActionResult> AddCourse()
-    //{
-    //    var subjects = await _context.Subjects.ToListAsync();
-    //    var viewModel = new CourseViewModel
-    //    {
-    //        AvailableSubjects = subjects.Select(s => new SelectListItem
-    //        {
-    //            Value = s.SubjectId.ToString(),
-    //            Text = s.SubjectName
-    //        })
-    //    };
-    //    return View(viewModel);
-    //}
+            AllSubjects = _context.Subjects
+                .Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = s.Name
+                }).ToList(),
 
-    //// POST: /Admin/AddCourse
-    //[HttpPost]
-    //public async Task<IActionResult> AddCourse(CourseViewModel model)
-    //{
-    //    if (ModelState.IsValid)
-    //    {
-    //        var course = new Course
-    //        {
-    //            CourseName = model.CourseName,
-    //            UniversityId = model.UniversityId,
-    //            RequiredSubjects = model.SelectedRequiredSubjects.Select(id => new RequiredSubject
-    //            {
-    //                SubjectId = id
-    //            }).ToList(),
-    //            AlternativeSubjects = model.SelectedAlternativeSubjects.Select(id => new AlternativeSubject
-    //            {
-    //                SubjectId = id
-    //            }).ToList()
-    //        };
+            LevelOptions = Enumerable.Range(1, 7).Select(l => new LevelOption
+            {
+                Level = l,
+                Description = $"Level {l}"
+            }).ToList()
+        };
 
-    //        _context.Courses.Add(course);
-    //        await _context.SaveChangesAsync();
-    //        return RedirectToAction("Index");
-    //    }
+        return View(viewModel);
+    }
 
-    //    // Repopulate subjects if the model is invalid
-    //    model.AvailableSubjects = await _context.Subjects
-    //        .Select(s => new SelectListItem
-    //        {
-    //            Value = s.SubjectId.ToString(),
-    //            Text = s.SubjectName
-    //        }).ToListAsync();
-    //    return View(model);
-    //}
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateCourse(CourseViewModel model)
+    {
+        _logger.LogInformation("CreateCourse POST method started.");
 
+        if (!ModelState.IsValid)
+        {
+            _logger.LogWarning("Model state is not valid.");
+            LogModelStateErrors();
+            await PopulateViewModel(model);
+            return View(model);
+        }
+
+        try
+        {
+            var university = await _context.SAUniversities.FindAsync(model.SelectedUniversityId);
+            if (university == null)
+            {
+                ModelState.AddModelError("SelectedUniversityId", "Selected university not found.");
+                _logger.LogWarning($"Selected university with ID {model.SelectedUniversityId} not found.");
+                await PopulateViewModel(model);
+                return View(model);
+            }
+
+            var course = new Course
+            {
+                UniversityId = model.SelectedUniversityId,
+                CourseName = model.CourseName,
+                Points = model.Points,
+                Description = model.Description
+            };
+
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation($"Course '{course.CourseName}' saved successfully with ID {course.CourseId}.");
+
+            await SaveRequiredSubjects(model, course.CourseId);
+            await SaveAlternativeSubjects(model, course.CourseId);
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while saving the course and subjects.");
+            ModelState.AddModelError("", "An error occurred while saving the course and subjects. Please try again.");
+            await PopulateViewModel(model);
+            return View(model);
+        }
+    }
+
+
+    private async Task SaveRequiredSubjects(CourseViewModel model, int courseId)
+    {
+        if (model.SelectedRequiredSubjects != null && model.SelectedRequiredSubjects.Any())
+        {
+            foreach (var subjectId in model.SelectedRequiredSubjects)
+            {
+                var subjectLevel = model.RequiredSubjectLevels.TryGetValue(subjectId, out int level) ? level : 1;
+                var subjectRequired = new SubjectRequired
+                {
+                    CourseId = courseId,
+                    SubjectId = subjectId,
+                    SubjectLevel = subjectLevel
+                };
+                _context.SubjectRequireds.Add(subjectRequired);
+            }
+            await _context.SaveChangesAsync();
+            _logger.LogInformation($"Required subjects saved successfully for course ID {courseId}.");
+        }
+    }
+
+    private async Task SaveAlternativeSubjects(CourseViewModel model, int courseId)
+    {
+        if (model.SelectedAlternativeSubjects != null && model.SelectedAlternativeSubjects.Any())
+        {
+            foreach (var subjectId in model.SelectedAlternativeSubjects)
+            {
+                var subjectLevel = model.AlternativeSubjectLevels.TryGetValue(subjectId, out int level) ? level : 1;
+
+                // Fetch the subject name from the database using the SubjectId
+                var subjectName = await _context.Subjects.Where(s => s.Id == subjectId).Select(s => s.Name).FirstOrDefaultAsync();
+
+                var alternativeSubject = new AlternativeSubject
+                {
+                    CourseId = courseId,
+                    SubjectId = subjectId,
+                    AlternativeSubjectLevel = subjectLevel,
+                    AlternativeSubjectName = subjectName,
+                    NumberOfRequiredAlternativeSubjects = model.NumberOfRequiredAlternativeSubjects
+                };
+
+                _context.AlternativeSubjects.Add(alternativeSubject);
+            }
+            await _context.SaveChangesAsync();
+            _logger.LogInformation($"Alternative subjects saved successfully for course ID {courseId}.");
+        }
+    }
+
+
+
+    private void LogModelStateErrors()
+    {
+        foreach (var state in ModelState)
+        {
+            foreach (var error in state.Value.Errors)
+            {
+                _logger.LogWarning($"Property: {state.Key}, Error: {error.ErrorMessage}");
+            }
+        }
+    }
+
+
+
+
+
+    private async Task PopulateViewModel(CourseViewModel model)
+    {
+        model.Universities = await _context.SAUniversities
+            .Select(u => new SelectListItem
+            {
+                Value = u.Id.ToString(),
+                Text = u.UniversityName
+            }).ToListAsync();
+
+        model.AllSubjects = await _context.Subjects
+            .Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Name
+            }).ToListAsync();
+
+        model.LevelOptions = Enumerable.Range(1, 7).Select(l => new LevelOption
+        {
+            Level = l,
+            Description = $"Level {l}"
+        }).ToList();
+    }
 }

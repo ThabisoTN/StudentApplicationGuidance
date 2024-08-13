@@ -36,11 +36,10 @@ namespace StudentApplicationGuidance
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Add SubjectServices to DI container
-            builder.Services.AddScoped<SubjectService>(); // Example for SubjectServices
-            builder.Services.AddScoped<UserSubjectService>(); // Example for UserSubjectService
+            builder.Services.AddScoped<SubjectService>();
+            builder.Services.AddScoped<UserSubjectService>();
             builder.Services.AddScoped<CourseQualificationService>();
             builder.Services.AddScoped<TutorAIService>();
-            
 
             // Controllers and Views configuration
             builder.Services.AddControllersWithViews();

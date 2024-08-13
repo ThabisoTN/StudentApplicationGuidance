@@ -1,8 +1,8 @@
 ﻿namespace StudentApplicationGuidance.Data
 {
-    public class University
+    public class SAUniversities
     {
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public string UniversityName { get; set; }
     }
 }

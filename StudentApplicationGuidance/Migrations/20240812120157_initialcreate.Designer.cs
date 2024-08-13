@@ -12,8 +12,8 @@ using StudentApplicationGuidance.Data;
 namespace StudentApplicationGuidance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240729074158_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240812120157_initialcreate")]
+    partial class initialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -180,6 +180,9 @@ namespace StudentApplicationGuidance.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<int>("NumberOfRequiredAlternativeSubjects")
+                        .HasColumnType("int");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
@@ -309,6 +312,23 @@ namespace StudentApplicationGuidance.Migrations
                     b.ToTable("Provinces");
                 });
 
+            modelBuilder.Entity("StudentApplicationGuidance.Data.SAUniversities", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UniversityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SAUniversities");
+                });
+
             modelBuilder.Entity("StudentApplicationGuidance.Data.Subject", b =>
                 {
                     b.Property<int>("Id")
@@ -365,18 +385,18 @@ namespace StudentApplicationGuidance.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
-                    b.Property<string>("University")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UniversityId")
+                        .HasColumnType("int");
 
                     b.HasKey("CourseId");
+
+                    b.HasIndex("UniversityId");
 
                     b.ToTable("Courses");
                 });
@@ -499,7 +519,7 @@ namespace StudentApplicationGuidance.Migrations
 
             modelBuilder.Entity("StudentApplicationGuidance.Data.SubjectRequired", b =>
                 {
-                    b.HasOne("StudentApplicationGuidance.Models.Course", null)
+                    b.HasOne("StudentApplicationGuidance.Models.Course", "Course")
                         .WithMany("SubjectRequired")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -511,7 +531,20 @@ namespace StudentApplicationGuidance.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Course");
+
                     b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("StudentApplicationGuidance.Models.Course", b =>
+                {
+                    b.HasOne("StudentApplicationGuidance.Data.SAUniversities", "University")
+                        .WithMany()
+                        .HasForeignKey("UniversityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("University");
                 });
 
             modelBuilder.Entity("StudentApplicationGuidance.Models.UserSubject", b =>

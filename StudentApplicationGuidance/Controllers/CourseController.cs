@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Data;
 using StudentApplicationGuidance.Models;
@@ -11,7 +10,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
 
 namespace StudentApplicationGuidance.Controllers
 {
@@ -27,23 +25,25 @@ namespace StudentApplicationGuidance.Controllers
             TutorAIService tutorAIService,
             CourseQualificationService qualificationService,
             ILogger<CoursesController> logger)
-
-
-         {
+        {
             _context = context;
             _tutorAIService = tutorAIService;
             _qualificationService = qualificationService;
             _logger = logger;
         }
 
-
         public IActionResult Index(string university)
         {
-            var coursesQuery = _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).AsQueryable();
+            var coursesQuery = _context.Courses
+                                       .AsNoTracking() // For performance, disable tracking as we are not modifying entities
+                                       .Include(c => c.University) // Ensure University is eagerly loaded
+                                       .Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject)
+                                       .Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject)
+                                       .AsQueryable();
 
             if (!string.IsNullOrEmpty(university))
             {
-                coursesQuery = coursesQuery.Where(c => c.University == university);
+                coursesQuery = coursesQuery.Where(c => c.University.UniversityName == university);
             }
 
             var courses = coursesQuery.ToList();
@@ -51,9 +51,12 @@ namespace StudentApplicationGuidance.Controllers
             var model = new CourseListViewModel
             {
                 Courses = courses,
-                Universities = _context.Courses.Select(c => c.University).Distinct().ToList(),
+                Universities = _context.SAUniversities.Select(u => u.UniversityName).Distinct().ToList(),
                 SelectedUniversity = university,
-                UserSubjects = _context.UserSubjects.Include(us => us.Subject).Where(us => us.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier)).ToList()
+                UserSubjects = _context.UserSubjects
+                                        .Include(us => us.Subject)
+                                        .Where(us => us.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                        .ToList()
             };
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -64,14 +67,12 @@ namespace StudentApplicationGuidance.Controllers
             return View(model);
         }
 
-
-
         [HttpGet]
         public async Task<IActionResult> SelectCourse()
         {
             _logger.LogInformation("SelectCourse action method called");
 
-            var universities = await _context.Courses.Select(c => c.University).Distinct().ToListAsync();
+            var universities = await _context.SAUniversities.Select(u => u.UniversityName).Distinct().ToListAsync();
             var courses = await _context.Courses.Select(c => c.CourseName).Distinct().ToListAsync();
 
             var modelView = new SelectCourseViewModel
@@ -83,20 +84,31 @@ namespace StudentApplicationGuidance.Controllers
             return View(modelView);
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> GetCoursesByUniversity(string university)
+        public async Task<IActionResult> GetCoursesByUniversity(string universityName)
         {
-            if (string.IsNullOrEmpty(university))
+            if (string.IsNullOrEmpty(universityName))
             {
                 return Json(new List<string>());
             }
 
-            var courses = await _context.Courses.Where(c => c.University == university).Select(c => c.CourseName).ToListAsync();
+            var universityId = await _context.SAUniversities
+                                             .Where(u => u.UniversityName == universityName)
+                                             .Select(u => u.Id)
+                                             .FirstOrDefaultAsync();
+
+            if (universityId == 0)
+            {
+                return Json(new List<string>());
+            }
+
+            var courses = await _context.Courses
+                                        .Where(c => c.UniversityId == universityId)
+                                        .Select(c => c.CourseName)
+                                        .ToListAsync();
 
             return Json(courses);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> CheckQualificationAjax(string university, string courseName)
@@ -108,7 +120,11 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "University and course must be selected." });
                 }
 
-                var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
+                var course = await _context.Courses
+                    .Include(c => c.University)
+                    .Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject)
+                    .Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject)
+                    .FirstOrDefaultAsync(c => c.University.UniversityName == university && c.CourseName == courseName);
 
                 if (course == null)
                 {
@@ -121,9 +137,12 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "Please log in to check qualification." });
                 }
 
-                var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
+                var userSubjects = await _context.UserSubjects
+                                                 .Include(us => us.Subject)
+                                                 .Where(us => us.UserId == userId)
+                                                 .ToListAsync();
 
-                if (userSubjects == null || !userSubjects.Any())
+                if (!userSubjects.Any())
                 {
                     return Json(new { success = false, message = "Please add your subjects to check qualification." });
                 }
@@ -143,17 +162,30 @@ namespace StudentApplicationGuidance.Controllers
             }
         }
 
-
-
         [HttpGet]
-        public async Task<IActionResult> CheckQualification(string university, string courseName)
+        public async Task<IActionResult> CheckQualification(string universityName, string courseName)
         {
-            if (string.IsNullOrEmpty(university) || string.IsNullOrEmpty(courseName))
+            if (string.IsNullOrEmpty(universityName) || string.IsNullOrEmpty(courseName))
             {
                 return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
 
-            var course = await _context.Courses.Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject).Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject).FirstOrDefaultAsync(c => c.University == university && c.CourseName == courseName);
+            var universityId = await _context.SAUniversities
+                                             .Where(u => u.UniversityName == universityName)
+                                             .Select(u => u.Id)
+                                             .FirstOrDefaultAsync();
+
+            if (universityId == 0)
+            {
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+
+            var course = await _context.Courses
+                                       .Include(c => c.SubjectRequired)
+                                       .ThenInclude(sr => sr.Subject)
+                                       .Include(c => c.AlternativeSubjects)
+                                       .ThenInclude(asub => asub.Subject)
+                                       .FirstOrDefaultAsync(c => c.UniversityId == universityId && c.CourseName == courseName);
 
             if (course == null)
             {
@@ -166,7 +198,10 @@ namespace StudentApplicationGuidance.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var userSubjects = await _context.UserSubjects.Where(us => us.UserId == userId).Include(us => us.Subject).ToListAsync();
+            var userSubjects = await _context.UserSubjects
+                                             .Include(us => us.Subject)
+                                             .Where(us => us.UserId == userId)
+                                             .ToListAsync();
 
             var (qualifies, reasons) = _qualificationService.CheckCourseQualification(course, userSubjects);
 
@@ -180,7 +215,6 @@ namespace StudentApplicationGuidance.Controllers
 
             return View(viewModel);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetCareerAdvice([FromQuery] int courseId)
@@ -199,9 +233,7 @@ namespace StudentApplicationGuidance.Controllers
                     return Json(new { success = false, message = "Course not found." });
                 }
 
-                // Create a list with a single course
                 var courses = new List<Course> { course };
-
                 var careerAdvice = await _tutorAIService.GenerateCareerAdviceAsync(courses);
                 return Json(new { success = true, advice = careerAdvice });
             }
@@ -211,7 +243,5 @@ namespace StudentApplicationGuidance.Controllers
                 return Json(new { success = false, message = "An error occurred while generating career advice. Please try again." });
             }
         }
-
     }
 }
-

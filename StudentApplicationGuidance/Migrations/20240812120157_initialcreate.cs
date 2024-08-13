@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StudentApplicationGuidance.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,22 +23,6 @@ namespace StudentApplicationGuidance.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Courses",
-                columns: table => new
-                {
-                    CourseId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    University = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CourseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Points = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Courses", x => x.CourseId);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,6 +49,19 @@ namespace StudentApplicationGuidance.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Provinces", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SAUniversities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UniversityName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SAUniversities", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -143,56 +140,23 @@ namespace StudentApplicationGuidance.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AlternativeSubjects",
+                name: "Courses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    CourseId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SubjectId = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false),
-                    AlternativeSubjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AlternativeSubjectLevel = table.Column<int>(type: "int", nullable: false)
+                    UniversityId = table.Column<int>(type: "int", nullable: false),
+                    CourseName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Points = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AlternativeSubjects", x => x.Id);
+                    table.PrimaryKey("PK_Courses", x => x.CourseId);
                     table.ForeignKey(
-                        name: "FK_AlternativeSubjects_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AlternativeSubjects_Subjects_SubjectId",
-                        column: x => x.SubjectId,
-                        principalTable: "Subjects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SubjectRequireds",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SubjectId = table.Column<int>(type: "int", nullable: false),
-                    CourseId = table.Column<int>(type: "int", nullable: false),
-                    SubjectLevel = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SubjectRequireds", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SubjectRequireds_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SubjectRequireds_Subjects_SubjectId",
-                        column: x => x.SubjectId,
-                        principalTable: "Subjects",
+                        name: "FK_Courses_SAUniversities_UniversityId",
+                        column: x => x.UniversityId,
+                        principalTable: "SAUniversities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -309,6 +273,62 @@ namespace StudentApplicationGuidance.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AlternativeSubjects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubjectId = table.Column<int>(type: "int", nullable: false),
+                    NumberOfRequiredAlternativeSubjects = table.Column<int>(type: "int", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    AlternativeSubjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AlternativeSubjectLevel = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AlternativeSubjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AlternativeSubjects_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AlternativeSubjects_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubjectRequireds",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubjectId = table.Column<int>(type: "int", nullable: false),
+                    CourseId = table.Column<int>(type: "int", nullable: false),
+                    SubjectLevel = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubjectRequireds", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubjectRequireds_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "CourseId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubjectRequireds_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AlternativeSubjects_CourseId",
                 table: "AlternativeSubjects",
@@ -369,6 +389,11 @@ namespace StudentApplicationGuidance.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Courses_UniversityId",
+                table: "Courses",
+                column: "UniversityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubjectRequireds_CourseId",
                 table: "SubjectRequireds",
                 column: "CourseId");
@@ -427,6 +452,9 @@ namespace StudentApplicationGuidance.Migrations
 
             migrationBuilder.DropTable(
                 name: "Subjects");
+
+            migrationBuilder.DropTable(
+                name: "SAUniversities");
 
             migrationBuilder.DropTable(
                 name: "FundingSources");
