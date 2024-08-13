@@ -1,95 +1,117 @@
 ﻿@model StudentApplicationGuidance.Models.CourseViewModel
 
-<form asp-action="CreateCourse" method="post" class="p-4 bg-light border rounded">
-    <div class="form-group">
-        <label asp-for="SelectedUniversityId" class="control-label text-primary">University</label>
-        <select asp-for="SelectedUniversityId" asp-items="Model.Universities" class="form-control border-primary">
-            <option value="">Select a university</option>
-        </select>
-        <span asp-validation-for="SelectedUniversityId" class="text-danger"></span>
-    </div>
+<div class="container">
+    <!-- Course Information Card -->
+    <div class="card mb-4" id="courseInfoCard">
+        <div class="card-header bg-primary text-white">
+            Course Information
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label asp-for="SelectedUniversityId" class="control-label">University</label>
+                <select asp-for="SelectedUniversityId" asp-items="Model.Universities" class="form-control">
+                    <option value="">Select a university</option>
+                </select>
+                <span asp-validation-for="SelectedUniversityId" class="text-danger"></span>
+            </div>
 
+            <div class="form-group">
+                <label asp-for="CourseName" class="control-label">Course Name</label>
+                <input asp-for="CourseName" class="form-control" />
+                <span asp-validation-for="CourseName" class="text-danger"></span>
+            </div>
 
+            <div class="form-group">
+                <label asp-for="Points" class="control-label">Points</label>
+                <input asp-for="Points" class="form-control" />
+                <span asp-validation-for="Points" class="text-danger"></span>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="CourseName" class="control-label text-primary">Course Name</label>
-        <input asp-for="CourseName" class="form-control border-primary" />
-        <span asp-validation-for="CourseName" class="text-danger"></span>
-    </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Description</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="Points" class="control-label text-primary">Points</label>
-        <input asp-for="Points" class="form-control border-primary" />
-        <span asp-validation-for="Points" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Description" class="control-label text-primary">Description</label>
-        <textarea asp-for="Description" class="form-control border-primary"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="NumberOfRequiredAlternativeSubjects" class="control-label text-primary">Number of Required Alternative Subjects</label>
-        <input asp-for="NumberOfRequiredAlternativeSubjects" class="form-control border-primary" />
-        <span asp-validation-for="NumberOfRequiredAlternativeSubjects" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="NumberOfRequiredAlternativeSubjects" class="control-label">Number of Required Alternative Subjects</label>
+                <input asp-for="NumberOfRequiredAlternativeSubjects" class="form-control" />
+                <span asp-validation-for="NumberOfRequiredAlternativeSubjects" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
     <div class="row">
+        <!-- Required Subjects Card -->
         <div class="col-md-6">
-            <div class="form-group">
-                <label class="control-label text-success">Required Subjects</label>
-                <div class="required-subjects">
-                    @foreach (var subject in Model.AllSubjects)
-                    {
-                        <div class="subject-item">
-                            <div class="form-check">
-                                <input type="checkbox" name="SelectedRequiredSubjects" value="@subject.Value" class="form-check-input" id="required-@subject.Value" />
-                                <label class="form-check-label" for="required-@subject.Value">@subject.Text</label>
+            <div class="card mb-4" id="requiredSubjectsCard">
+                <div class="card-header bg-success text-white">
+                    Required Subjects
+                </div>
+                <div class="card-body">
+                    <div class="required-subjects">
+                        @foreach (var subject in Model.AllSubjects)
+                        {
+                            <div class="subject-item">
+                                <div class="form-check">
+                                    <input type="checkbox" name="SelectedRequiredSubjects" value="@subject.Value" class="form-check-input" id="required-@subject.Value" />
+                                    <label class="form-check-label" for="required-@subject.Value">@subject.Text</label>
+                                </div>
+                                <select name="RequiredSubjectLevels[@subject.Value]" class="form-control level-options">
+                                    @foreach (var level in Model.LevelOptions)
+                                    {
+                                        <option value="@level.Level">@level.Description</option>
+                                    }
+                                </select>
                             </div>
-                            <select name="RequiredSubjectLevels[@subject.Value]" class="form-control level-options border-success">
-                                @foreach (var level in Model.LevelOptions)
-                                {
-                                    <option value="@level.Level">@level.Description</option>
-                                }
-                            </select>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Alternative Subjects Card -->
         <div class="col-md-6">
-            <div class="form-group">
-                <label class="control-label text-info">Alternative Subjects</label>
-                <div class="alternative-subjects">
-                    @foreach (var subject in Model.AllSubjects)
-                    {
-                        <div class="subject-item">
-                            <div class="form-check">
-                                <input type="checkbox" name="SelectedAlternativeSubjects" value="@subject.Value" class="form-check-input" id="alternative-@subject.Value" />
-                                <label class="form-check-label" for="alternative-@subject.Value">@subject.Text</label>
+            <div class="card mb-4" id="alternativeSubjectsCard">
+                <div class="card-header bg-info text-white">
+                    Alternative Subjects
+                </div>
+                <div class="card-body">
+                    <div class="alternative-subjects">
+                        @foreach (var subject in Model.AllSubjects)
+                        {
+                            <div class="subject-item">
+                                <div class="form-check">
+                                    <input type="checkbox" name="SelectedAlternativeSubjects" value="@subject.Value" class="form-check-input" id="alternative-@subject.Value" />
+                                    <label class="form-check-label" for="alternative-@subject.Value">@subject.Text</label>
+                                </div>
+                                <select name="AlternativeSubjectLevels[@subject.Value]" class="form-control level-options">
+                                    @foreach (var level in Model.LevelOptions)
+                                    {
+                                        <option value="@level.Level">@level.Description</option>
+                                    }
+                                </select>
                             </div>
-                            <select name="AlternativeSubjectLevels[@subject.Value]" class="form-control level-options border-info">
-                                @foreach (var level in Model.LevelOptions)
-                                {
-                                    <option value="@level.Level">@level.Description</option>
-                                }
-                            </select>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-</form>
+</div>
 
 <style>
-    .required-subjects, .alternative-subjects {
-        margin-bottom: 15px;
+    .card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
     }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
 
     .subject-item {
         margin-bottom: 10px;
@@ -114,5 +136,28 @@
 
     .form-check-label {
         margin-left: 0.5rem;
+    }
+
+    /* Specific Card Header Colors */
+    #courseInfoCard .card-header {
+        background-color: #007bff; /* Blue */
+    }
+
+    #requiredSubjectsCard .card-header {
+        background-color: #28a745; /* Green */
+    }
+
+    #alternativeSubjectsCard .card-header {
+        background-color: #17a2b8; /* Cyan */
+    }
+
+    .card {
+        max-width: 100%;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+
+    .card-body {
+        padding: 15px;
     }
 </style>
