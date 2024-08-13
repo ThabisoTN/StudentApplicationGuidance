@@ -12,7 +12,7 @@ using StudentApplicationGuidance.Data;
 namespace StudentApplicationGuidance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240812120157_initialcreate")]
+    [Migration("20240813091052_initialcreate")]
     partial class initialcreate
     {
         /// <inheritdoc />

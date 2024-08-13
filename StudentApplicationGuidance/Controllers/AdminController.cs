@@ -58,21 +58,25 @@ public class AdminController : Controller
             return View("Error");
         }
     }
-
     // Get: /Admin/Courses
     public async Task<IActionResult> Courses()
     {
         try
         {
-            var course = await _context.Courses.ToListAsync();
-            return View(course);
+            // Eagerly load the University navigation property
+            var courses = await _context.Courses
+                .Include(c => c.University)  // Include the University data
+                .ToListAsync();
+
+            return View(courses);
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An error occurred while retrieving Course: {ex.Message}");
+            _logger.LogError($"An error occurred while retrieving Courses: {ex.Message}");
             return View("Error");
         }
     }
+
 
     public IActionResult CreateCourse()
     {

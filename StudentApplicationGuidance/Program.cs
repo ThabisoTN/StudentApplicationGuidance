@@ -1,10 +1,6 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using StudentApplicationGuidance.Data;
 using StudentApplicationGuidance.Models;
 using StudentApplicationGuidance.Services;
@@ -33,9 +29,10 @@ namespace StudentApplicationGuidance
             {
                 options.SignIn.RequireConfirmedAccount = true;
             })
+            .AddRoles<IdentityRole>()  // Enable role management
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            // Add SubjectServices to DI container
+            // Add services to DI container
             builder.Services.AddScoped<SubjectService>();
             builder.Services.AddScoped<UserSubjectService>();
             builder.Services.AddScoped<CourseQualificationService>();
@@ -53,7 +50,10 @@ namespace StudentApplicationGuidance
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
-                    DbInitializer.Initialize(context);
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                    DbInitializer.Initialize(context, userManager, roleManager);  // Pass required services to initialize
                 }
                 catch (Exception ex)
                 {

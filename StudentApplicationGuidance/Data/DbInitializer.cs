@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using StudentApplicationGuidance.Models;
 using System;
 
@@ -6,7 +7,7 @@ namespace StudentApplicationGuidance.Data
 {
     public static class DbInitializer
     {
-        public static void Initialize(ApplicationDbContext context)
+        public static void Initialize(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             context.Database.Migrate();
 
@@ -29,7 +30,10 @@ namespace StudentApplicationGuidance.Data
             {
                 SeedFundingSources(context);
             }
+
+            SeedAdmin(userManager, roleManager, context);  // Ensure Admin user and roles are seeded
         }
+
 
         private static void SeedSAUniversities(ApplicationDbContext context)
         {
@@ -125,5 +129,72 @@ namespace StudentApplicationGuidance.Data
             context.FundingSources.AddRange(fundingSources);
             context.SaveChanges();
         }
+
+
+
+
+        private static void SeedAdmin(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
+        {
+            const string ADMIN_ROLE = "Admin";
+            const string ADMIN_EMAIL = "admin@gmail.com";
+            const string ADMIN_PASSWORD = "Admin@1234";
+
+            // Ensure the Admin role exists
+            if (!roleManager.RoleExistsAsync(ADMIN_ROLE).Result)
+            {
+                var role = new IdentityRole(ADMIN_ROLE);
+                roleManager.CreateAsync(role).Wait();
+                Console.WriteLine("Admin role created.");
+            }
+
+            // Check if the admin user exists
+            if (userManager.FindByEmailAsync(ADMIN_EMAIL).Result == null)
+            {
+                // Get the Province and FundingSource IDs for the admin user
+                var province = context.Provinces.FirstOrDefault(p => p.Name == "Gauteng");
+                var fundingSource = context.FundingSources.FirstOrDefault(f => f.Name == "NSFAS");
+
+                if (province == null || fundingSource == null)
+                {
+                    throw new Exception("Province or FundingSource not found in the database. Ensure they are seeded first.");
+                }
+
+                var adminUser = new ApplicationUser
+                {
+                    UserName = ADMIN_EMAIL,
+                    Email = ADMIN_EMAIL,
+                    EmailConfirmed = true,
+                    FirstName = "Admin",
+                    LastName = "User",
+                    ProvinceId = province.Id,
+                    FundingSourceId = fundingSource.Id
+                };
+
+                var result = userManager.CreateAsync(adminUser, ADMIN_PASSWORD).Result;
+
+                if (result.Succeeded)
+                {
+                    userManager.AddToRoleAsync(adminUser, ADMIN_ROLE).Wait();
+                    Console.WriteLine("Admin user created and added to Admin role.");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to create admin user:");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"- {error.Description}");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Admin user already exists.");
+            }
+        }
     }
+
+
 }
+
+
+
