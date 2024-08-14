@@ -35,8 +35,8 @@ namespace StudentApplicationGuidance.Controllers
         public IActionResult Index(string university)
         {
             var coursesQuery = _context.Courses
-                                       .AsNoTracking() // For performance, disable tracking as we are not modifying entities
-                                       .Include(c => c.University) // Ensure University is eagerly loaded
+                                       .AsNoTracking()
+                                       .Include(c => c.University)
                                        .Include(c => c.SubjectRequired).ThenInclude(sr => sr.Subject)
                                        .Include(c => c.AlternativeSubjects).ThenInclude(asub => asub.Subject)
                                        .AsQueryable();

@@ -58,16 +58,13 @@ public class AdminController : Controller
             return View("Error");
         }
     }
+
     // Get: /Admin/Courses
     public async Task<IActionResult> Courses()
     {
         try
         {
-            // Eagerly load the University navigation property
-            var courses = await _context.Courses
-                .Include(c => c.University)  // Include the University data
-                .ToListAsync();
-
+            var courses = await _context.Courses.Include(c => c.University).ToListAsync();
             return View(courses);
         }
         catch (Exception ex)
@@ -105,6 +102,7 @@ public class AdminController : Controller
 
         return View(viewModel);
     }
+    
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -217,9 +215,6 @@ public class AdminController : Controller
             }
         }
     }
-
-
-
 
 
     private async Task PopulateViewModel(CourseViewModel model)

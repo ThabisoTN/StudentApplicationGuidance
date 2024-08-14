@@ -35,9 +35,9 @@
 
                 @if (course.AlternativeSubjects != null && course.AlternativeSubjects.Any())
                 {
-                    <h6 class="mt-3">Alternative Subjects:</h6>
+                   @*  <h6 class="mt-3">Alternative Subjects:</h6> *@
                     <p>
-                        minimum number of other Subjects:
+                        <h7>Minimum number of other designated Subjects required:</h7>
                         @course.AlternativeSubjects.FirstOrDefault()?.NumberOfRequiredAlternativeSubjects
                     </p>
                     <ul class="list-unstyled">

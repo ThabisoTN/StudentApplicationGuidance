@@ -31,7 +31,7 @@ namespace StudentApplicationGuidance.Data
                 SeedFundingSources(context);
             }
 
-            SeedAdmin(userManager, roleManager, context);  // Ensure Admin user and roles are seeded
+            SeedAdmin(userManager, roleManager, context); 
         }
 
 
@@ -41,7 +41,7 @@ namespace StudentApplicationGuidance.Data
             {
                 var sauniversities = new SAUniversities[]
                 {
-                    new SAUniversities { UniversityName = "University of Cape Town" },
+                    new SAUniversities { UniversityName = "University of KwaZulu-Natal" },
                     new SAUniversities { UniversityName = "Durban University of Technology" },
                     new SAUniversities { UniversityName = "Mangosuthu University of Technology" }
                 };
