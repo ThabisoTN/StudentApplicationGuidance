@@ -29,18 +29,29 @@ public class CourseQualificationService
             "English Home Language",
             "English First Additional Language",
             "Life Orientation",
-            "IsiZulu Home Language",
-            "IsiZulu First Additional Language",
-            "Afrikaans Home Language",
-            "Afrikaans First Additional Language",
             "Mathematics",
             "Mathematical Literacy"
         };
 
-        // Filter out the excluded subjects from the alternative subjects list
+        // Dynamic exclusion logic for IsiZulu and Afrikaans
+        bool isiZuluCounted = userSubjects.Any(us => us.Subject.Name.StartsWith("IsiZulu") && us.Level > 1);
+        bool afrikaansCounted = userSubjects.Any(us => us.Subject.Name.StartsWith("Afrikaans") && us.Level > 1);
+
+        if (isiZuluCounted)
+        {
+            excludedSubjects.Add("Afrikaans Home Language");
+            excludedSubjects.Add("Afrikaans First Additional Language");
+        }
+        else if (afrikaansCounted)
+        {
+            excludedSubjects.Add("IsiZulu Home Language");
+            excludedSubjects.Add("IsiZulu First Additional Language");
+        }
+
+        // Filter out the excluded subjects from alternative subjects before counting
         var filteredAlternativeSubjects = alternativeSubjects.Where(altSub => !excludedSubjects.Contains(altSub.Subject.Name)).ToList();
 
-        // Check if the user meets the minimum number of alternative subjects (excluding the specified ones)
+        // Check if user meets the minimum number of alternative subjects
         var qualifiedAlternativeSubjects = filteredAlternativeSubjects.Where(altSub => userSubjects.Any(us => us.SubjectId == altSub.SubjectId && us.Level >= altSub.AlternativeSubjectLevel)).Count();
 
         if (qualifiedAlternativeSubjects < filteredAlternativeSubjects.FirstOrDefault()?.NumberOfRequiredAlternativeSubjects)
@@ -48,14 +59,6 @@ public class CourseQualificationService
             reasons.Add($"You do not meet the minimum number of required alternative subjects. You need at least {filteredAlternativeSubjects.First().NumberOfRequiredAlternativeSubjects} alternative subjects.");
         }
 
-
-        //// Check if user meets the minimum number of alternative subjects
-        //var qualifiedAlternativeSubjects = alternativeSubjects.Where(altSub => userSubjects.Any(us => us.SubjectId == altSub.SubjectId && us.Level >= altSub.AlternativeSubjectLevel)) .Count();
-
-        //if (qualifiedAlternativeSubjects < alternativeSubjects.First().NumberOfRequiredAlternativeSubjects)
-        //{
-        //    reasons.Add($"You do not meet the minimum number of required alternative subjects. You need at least {alternativeSubjects.First().NumberOfRequiredAlternativeSubjects} alternative subjects.");
-        //}
 
         // Calculating user total subject points
         int totalPoints = CalculateTotalPoints(userSubjects);

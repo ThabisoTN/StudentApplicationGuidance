@@ -54,7 +54,7 @@ public class AdminController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An error occurred while retrieving users: {ex.Message}");
+            _logger.LogError($"An error occurred while users: {ex.Message}");
             return View("Error");
         }
     }

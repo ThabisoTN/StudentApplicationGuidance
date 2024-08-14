@@ -64,7 +64,7 @@
 
             @if (Model.Course?.AlternativeSubjects?.Any() == true)
             {
-                <h6>English (Home Language or First Additional Language) is required, along with at least one additional subject:</h6>
+                <h6>English is required, along with other required additional designated subject:</h6>
                 <ul>
                     @foreach (var altSubject in Model.Course.AlternativeSubjects)
                     {

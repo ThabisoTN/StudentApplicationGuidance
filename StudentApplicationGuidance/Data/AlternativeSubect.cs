@@ -6,7 +6,6 @@ namespace StudentApplicationGuidance.Data
     {
         public int Id { get; set; }
         public int SubjectId { get; set; }
-
         public int NumberOfRequiredAlternativeSubjects { get; set; }
         public Subject Subject { get; set; }
         public int CourseId { get; set; }
