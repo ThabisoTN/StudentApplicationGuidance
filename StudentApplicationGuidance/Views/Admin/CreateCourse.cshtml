@@ -1,5 +1,5 @@
 ﻿@model StudentApplicationGuidance.Models.CourseViewModel
-
+<main>
 <form asp-action="CreateCourse" method="post" class="p-4 bg-light border rounded">
     <div class="form-group">
         <label asp-for="SelectedUniversityId" class="control-label text-primary">University</label>
@@ -85,7 +85,7 @@
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
-
+</main>
 <style>
     .required-subjects, .alternative-subjects {
         margin-bottom: 15px;

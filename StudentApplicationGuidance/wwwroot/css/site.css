@@ -29,7 +29,6 @@ footer {
     padding: 1rem 0;
     margin-top: auto;
     width: 100%;
-   
     bottom: 0;
     left: 0;
 }
@@ -133,6 +132,7 @@ footer {
         border-color: var(--dark-blue);
         transform: translateY(-2px);
     }
+
 .navbar {
     margin-bottom: 20px; /* Adjust this value based on your needs */
 }
@@ -145,7 +145,6 @@ footer {
     font-size: 1.1rem;
     transition: all 0.3s ease;
 }
-
     .btn-secondary:hover {
         background-color: #e0a800;
         border-color: #e0a800;
@@ -193,4 +192,7 @@ footer {
         flex: 0 0 33.333333%;
         max-width: 33.333333%;
     }
+}
+footer {
+    color: black;
 }
