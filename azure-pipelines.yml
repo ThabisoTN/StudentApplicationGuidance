@@ -1,0 +1,65 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  azureSubscription: 'Microsoft Azure Sponsorship' # Replace with your Azure Subscription name or ID
+  sqlServerName: 'studentcareerguidance-server'
+  sqlDatabaseName: 'studentcareerguidance-database'
+  sqlAdminUsername: 'studentcareerguidance-server-admin'
+  sqlAdminPassword: 'Password$311' # Replace with your SQL Server Admin Password
+  connectionString: 'Server=tcp:studentcareerguidance-server.database.windows.net,1433;Initial Catalog=studentcareerguidance-database;Persist Security Info=False;User ID=studentcareerguidance-server-admin;Password=$(sqlAdminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+  webAppName: 'StudentCareerGuidance' # Replace with the name of your Azure Web App
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '$(azureSubscription)'
+    appName: '$(webAppName)'
+    package: '$(build.artifactStagingDirectory)\WebApp.zip'
+
+- task: SqlAzureDacpacDeployment@1
+  inputs:
+    azureSubscription: '$(azureSubscription)'
+    ServerName: '$(sqlServerName).database.windows.net'
+    DatabaseName: '$(sqlDatabaseName)'
+    sqlUsername: '$(sqlAdminUsername)'
+    sqlPassword: '$(sqlAdminPassword)'
+    DacpacFile: '$(build.artifactStagingDirectory)\YourDatabase.dacpac' # Replace with the actual path to your .dacpac file
+    IpDetectionMethod: 'AutoDetect'
+    appType: 'AzureSqlDatabase'  # Specify that the target is an Azure SQL Database
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'VSTest'
+    testResultsFiles: '**/*.trx'
+    mergeTestResults: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
