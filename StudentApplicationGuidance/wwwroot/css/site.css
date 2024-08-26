@@ -1,7 +1,12 @@
+/* Importing Google Fonts for enhanced typography */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* CSS Variables for consistent styling */
 :root {
-    --primary-blue: #007bff;
-    --dark-blue: #0056b3;
-    --light-blue: #e6f2ff;
+    --primary-blue: #1e3a8a; /* Navy */
+    --dark-green: #064e3b; /* Dark Green */
+    --deep-turquoise: #0f766e; /* Deep Turquoise */
+    --violet: #6d28d9; /* Violet */
     --black: #000000;
     --white: #ffffff;
     --yellow: #ffc107;
@@ -9,6 +14,7 @@
     --card-bg: #f0f8ff;
 }
 
+/* Base styles */
 body, html {
     height: 100%;
     margin: 0;
@@ -16,45 +22,49 @@ body, html {
     flex-direction: column;
     color: var(--black);
     background-color: var(--white);
+    font-family: 'Roboto', sans-serif; /* Enhanced typography */
 }
 
 .container {
     flex: 1;
 }
 
+/* Footer styles with enhanced design */
 footer {
     background-color: var(--black);
     color: var(--white);
     text-align: center;
-    padding: 1rem 0;
+    padding: 2rem 0; /* Increased padding */
     margin-top: auto;
     width: 100%;
-   
-    bottom: 0;
-    left: 0;
+    font-size: 0.9rem; /* Smaller font size for footer text */
 }
 
     footer a {
         color: var(--primary-blue);
         text-decoration: none;
+        margin-right: 10px; /* Space between links */
     }
 
-        footer a:hover {
-            color: var(--light-blue);
+        footer a:hover, footer a:focus {
+            color: var(--deep-turquoise);
             text-decoration: underline;
+            outline: 2px solid var(--primary-blue); /* Custom focus outline */
+            outline-offset: 2px;
         }
 
-/* Home page styles */
+/* Home page specific styles */
 .home-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    background: var(--light-gray); /* Light gray background for the container */
 }
 
 .hero {
     text-align: center;
     padding: 60px 0;
-    background-color: var(--light-blue);
+    background-color: var(--deep-turquoise);
     border-radius: 10px;
     margin-bottom: 40px;
 }
@@ -62,14 +72,21 @@ footer {
     .hero h1 {
         font-size: 2.5rem;
         margin-bottom: 20px;
-        color: var(--black);
+        color: var(--white);
     }
 
     .hero p {
         font-size: 1.2rem;
         margin-bottom: 30px;
-        color: var(--black);
+        color: var(--white);
+        line-height: 1.6; /* Improved line height for readability */
     }
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Space between buttons */
+}
 
 .features {
     margin-bottom: 40px;
@@ -109,16 +126,17 @@ footer {
 .cta {
     text-align: center;
     padding: 60px 0;
-    background-color: var(--light-blue);
+    background-color: var(--violet);
     border-radius: 10px;
     margin-bottom: 40px;
 }
 
     .cta h2 {
         margin-bottom: 30px;
-        color: var(--black);
+        color: var(--white);
     }
 
+/* Button styles with transitions for interactive effects */
 .btn-primary {
     background-color: var(--primary-blue);
     border-color: var(--primary-blue);
@@ -129,13 +147,10 @@ footer {
 }
 
     .btn-primary:hover {
-        background-color: var(--dark-blue);
-        border-color: var(--dark-blue);
+        background-color: var(--dark-green);
+        border-color: var(--dark-green);
         transform: translateY(-2px);
     }
-.navbar {
-    margin-bottom: 20px; /* Adjust this value based on your needs */
-}
 
 .btn-secondary {
     background-color: var(--yellow);
@@ -152,7 +167,7 @@ footer {
         transform: translateY(-2px);
     }
 
-/* Responsive adjustments */
+/* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
     .hero {
         padding: 40px 0;
@@ -173,9 +188,14 @@ footer {
     .cta {
         padding: 40px 0;
     }
+
+    .button-container {
+        flex-direction: column;
+        gap: 10px; /* Space between buttons */
+    }
 }
 
-/* New styles for better card layout */
+/* Grid layout adjustments */
 .row {
     display: flex;
     flex-wrap: wrap;

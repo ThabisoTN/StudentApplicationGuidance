@@ -4,8 +4,6 @@
     ViewData["Title"] = "Register";
 }
 
-
-
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
@@ -45,13 +43,22 @@
                         </div>
 
                         <div class="mb-3">
-                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Password" />
+                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Password" id="password" />
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" />
+                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" id="confirmPassword" />
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <div id="passwordRequirements">
+                            <p>Your password has:</p>
+                            <ul>
+                                <li id="lengthRequirement" class="text-danger">8 or more characters</li>
+                                <li id="letterRequirement" class="text-danger">At least 1 letter or symbol</li>
+                                <li id="numberRequirement" class="text-danger">At least 1 number</li>
+                            </ul>
                         </div>
 
                         <div class="d-grid">
@@ -63,36 +70,82 @@
         </div>
     </div>
 </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            
-           
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                       
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
+
+<div class="col-md-6 col-md-offset-2">
+    <section>
+        @{
+            if ((Model.ExternalLogins?.Count ?? 0) == 0)
+            {
+                <div></div>
             }
-        </section>
-    </div>
+            else
+            {
+                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                    <div>
+                        <p>
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                            }
+                        </p>
+                    </div>
+                </form>
+            }
+        }
+    </section>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const lengthRequirement = document.getElementById('lengthRequirement');
+            const letterRequirement = document.getElementById('letterRequirement');
+            const numberRequirement = document.getElementById('numberRequirement');
+
+            passwordInput.addEventListener('input', validatePassword);
+            confirmPasswordInput.addEventListener('input', validatePassword);
+
+            function validatePassword() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                // Check length
+                if (password.length >= 8) {
+                    lengthRequirement.classList.remove('text-danger');
+                    lengthRequirement.classList.add('text-success');
+                } else {
+                    lengthRequirement.classList.remove('text-success');
+                    lengthRequirement.classList.add('text-danger');
+                }
+
+                // Check for letter or symbol
+                if (/[a-zA-Z]/.test(password) || /[^a-zA-Z0-9]/.test(password)) {
+                    letterRequirement.classList.remove('text-danger');
+                    letterRequirement.classList.add('text-success');
+                } else {
+                    letterRequirement.classList.remove('text-success');
+                    letterRequirement.classList.add('text-danger');
+                }
+
+                // Check for number
+                if (/\d/.test(password)) {
+                    numberRequirement.classList.remove('text-danger');
+                    numberRequirement.classList.add('text-success');
+                } else {
+                    numberRequirement.classList.remove('text-success');
+                    numberRequirement.classList.add('text-danger');
+                }
+
+                // Check if passwords match
+                if (password === confirmPassword) {
+                    confirmPasswordInput.setCustomValidity('');
+                } else {
+                    confirmPasswordInput.setCustomValidity('Passwords do not match');
+                }
+            }
+        });
+    </script>
 }
-  
