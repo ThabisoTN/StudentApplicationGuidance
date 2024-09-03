@@ -3,7 +3,7 @@
 <form asp-action="CreateCourse" method="post" class="p-4 bg-light border rounded">
     <div class="form-group">
         <label asp-for="SelectedUniversityId" class="control-label text-primary">University</label>
-        <select asp-for="SelectedUniversityId" asp-items="Model.Universities" class="form-control border-primary">
+        <select asp-for="SelectedUniversityId" asp-items="Model.SAUniversities" class="form-control border-primary">
             <option value="">Select a university</option>
         </select>
         <span asp-validation-for="SelectedUniversityId" class="text-danger"></span>

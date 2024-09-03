@@ -10,7 +10,7 @@ namespace StudentApplicationGuidance.Models
         public int Points { get; set; }
         public string Description { get; set; }
         public int SelectedUniversityId { get; set; }
-        public IEnumerable<SelectListItem> Universities { get; set; } = new List<SelectListItem>();
+        public IEnumerable<SelectListItem> SAUniversities { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> AllSubjects { get; set; } = new List<SelectListItem>();
         public IEnumerable<LevelOption> LevelOptions { get; set; } = new List<LevelOption>();
         public IEnumerable<int> SelectedRequiredSubjects { get; set; } = new List<int>();

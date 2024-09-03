@@ -1,0 +1,86 @@
+﻿@model StudentApplicationGuidance.Models.CourseViewModel
+
+<main>
+    <form asp-action="EditCourse" asp-route-id="@Model.CourseId" method="post" class="p-4 bg-light border rounded">
+        <input type="hidden" asp-for="CourseId" />
+        <div class="form-group">
+            <label asp-for="SelectedUniversityId" class="control-label text-primary">University</label>
+            <select asp-for="SelectedUniversityId" asp-items="Model.SAUniversities" class="form-control border-primary">
+                <option value="">Select a university</option>
+            </select>
+            <span asp-validation-for="SelectedUniversityId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CourseName" class="control-label text-primary">Course Name</label>
+            <input asp-for="CourseName" class="form-control border-primary" />
+            <span asp-validation-for="CourseName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Points" class="control-label text-primary">Points</label>
+            <input asp-for="Points" class="form-control border-primary" />
+            <span asp-validation-for="Points" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description" class="control-label text-primary">Description</label>
+            <textarea asp-for="Description" class="form-control border-primary"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div>
+            <h4>Required Subjects</h4>
+            @foreach (var subject in Model.AllSubjects)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="SelectedRequiredSubjects"
+                           value="@subject.Value" id="required-@subject.Value"
+                    @(Model.SelectedRequiredSubjects.Contains(int.Parse(subject.Value)) ? "checked" : "")>
+                    <label class="form-check-label" for="required-@subject.Value">@subject.Text</label>
+                </div>
+            }
+        </div>
+
+        <div>
+            <h4>Alternative Subjects</h4>
+            @foreach (var subject in Model.AllSubjects)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="SelectedAlternativeSubjects"
+                           value="@subject.Value" id="alternative-@subject.Value"
+                    @(Model.SelectedAlternativeSubjects.Contains(int.Parse(subject.Value)) ? "checked" : "")>
+                    <label class="form-check-label" for="alternative-@subject.Value">@subject.Text</label>
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</main>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        <strong>Success!</strong> @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["Changes"] is List<string> changes && changes.Any())
+{
+    <div>
+        <h4>Changes Applied:</h4>
+        <ul>
+            @foreach (var change in changes)
+            {
+                <li>@change</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div>
+        <h4>No changes were made.</h4>
+    </div>
+}

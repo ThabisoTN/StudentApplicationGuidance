@@ -1,0 +1,26 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+<div class="alert alert-success">
+    <strong>Success!</strong> @TempData["SuccessMessage"]
+</div>
+
+@if (TempData["Changes"] is List<string> changes && changes.Any())
+{
+    <div>
+        <h4>Changes Applied:</h4>
+        <ul>
+            @foreach (var change in changes)
+            {
+                <li>@change</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div>
+        <h4>No changes were made.</h4>
+    </div>
+}
