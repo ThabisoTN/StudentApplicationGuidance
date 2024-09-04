@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 public class AdminController : Controller
 {
@@ -230,16 +231,19 @@ public class AdminController : Controller
             Points = course.Points,
             Description = course.Description,
             SelectedUniversityId = course.UniversityId,
-            SAUniversities = _context.SAUniversities.Select(u => new SelectListItem { Value = u.Id.ToString(), Text = u.UniversityName }).ToList(),
-            AllSubjects = _context.Subjects.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name }).ToList(),
+            SAUniversities = await _context.SAUniversities.Select(u => new SelectListItem { Value = u.Id.ToString(), Text = u.UniversityName }).ToListAsync(),
+            AllSubjects = await _context.Subjects.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name }).ToListAsync(),
             LevelOptions = Enumerable.Range(1, 7).Select(i => new LevelOption { Level = i, Description = $"Level {i}" }).ToList(),
-            // Ensure integer IDs are converted properly if required
-            SelectedRequiredSubjects = course.SubjectRequired.Select(rs => rs.SubjectId).ToList(),  // Assuming SubjectId is an integer
-            SelectedAlternativeSubjects = course.AlternativeSubjects.Select(subj => subj.SubjectId).ToList() // Assuming SubjectId is an integer
+            SelectedRequiredSubjects = course.SubjectRequired.Select(rs => rs.SubjectId).ToList(),
+            SelectedAlternativeSubjects = course.AlternativeSubjects.Select(subj => subj.SubjectId).ToList(),
+            RequiredSubjectLevels = course.SubjectRequired.ToDictionary(sr => sr.SubjectId, sr => sr.SubjectLevel),
+            AlternativeSubjectLevels = course.AlternativeSubjects.ToDictionary(asub => asub.SubjectId, asub => asub.AlternativeSubjectLevel),
+            NumberOfRequiredAlternativeSubjects = course.AlternativeSubjects.FirstOrDefault()?.NumberOfRequiredAlternativeSubjects ?? 0
         };
 
         return View(viewModel);
     }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditCourse(int id, CourseViewModel model)
@@ -249,38 +253,227 @@ public class AdminController : Controller
             return NotFound();
         }
 
-        var course = await _context.Courses.FindAsync(id);
+        var course = await _context.Courses
+            .Include(c => c.SubjectRequired)
+            .Include(c => c.AlternativeSubjects)
+            .FirstOrDefaultAsync(c => c.CourseId == id);
+
         if (course == null)
         {
             return NotFound();
         }
 
-        List<string> changes = new List<string>();
-
-        if (course.CourseName != model.CourseName)
+        if (!ModelState.IsValid)
         {
-            changes.Add($"Course Name changed from '{course.CourseName}' to '{model.CourseName}'");
-            course.CourseName = model.CourseName;
-        }
-        if (course.Description != model.Description)
-        {
-            changes.Add($"Description changed from '{course.Description}' to '{model.Description}'");
-            course.Description = model.Description;
-        }
-        if (course.Points != model.Points)
-        {
-            changes.Add($"Points changed from '{course.Points}' to '{model.Points}'");
-            course.Points = model.Points;
+            _logger.LogWarning("Model state is not valid.");
+            LogModelStateErrors();
+            await PopulateViewModel(model);
+            return View(model);
         }
 
-        // Save the changes
-        _context.Update(course);
+        try
+        {
+            var changes = new List<Change>();
+
+            // Track changes in course properties
+            if (course.CourseName != model.CourseName)
+            {
+                changes.Add(new Change { Field = "Course Name", OldValue = course.CourseName, NewValue = model.CourseName });
+                course.CourseName = model.CourseName;
+            }
+
+            if (course.Description != model.Description)
+            {
+                changes.Add(new Change { Field = "Description", OldValue = course.Description, NewValue = model.Description });
+                course.Description = model.Description;
+            }
+
+            if (course.Points != model.Points)
+            {
+                changes.Add(new Change { Field = "Points", OldValue = course.Points.ToString(), NewValue = model.Points.ToString() });
+                course.Points = model.Points;
+            }
+
+            if (course.UniversityId != model.SelectedUniversityId)
+            {
+                var oldUniversity = await _context.SAUniversities.FindAsync(course.UniversityId);
+                var newUniversity = await _context.SAUniversities.FindAsync(model.SelectedUniversityId);
+                changes.Add(new Change { Field = "University", OldValue = oldUniversity?.UniversityName, NewValue = newUniversity?.UniversityName });
+                course.UniversityId = model.SelectedUniversityId;
+            }
+
+            if (course.NumberOfRequiredAlternativeSubjects != model.NumberOfRequiredAlternativeSubjects)
+            {
+                changes.Add(new Change { Field = "Number of Required Alternative Subjects", OldValue = course.NumberOfRequiredAlternativeSubjects.ToString(), NewValue = model.NumberOfRequiredAlternativeSubjects.ToString() });
+                course.NumberOfRequiredAlternativeSubjects = model.NumberOfRequiredAlternativeSubjects;
+            }
+
+            // Track changes in required subjects
+            var originalRequiredSubjects = course.SubjectRequired.Select(sr => sr.SubjectId).ToList();
+            var addedRequiredSubjects = model.SelectedRequiredSubjects.Except(originalRequiredSubjects).ToList();
+            var removedRequiredSubjects = originalRequiredSubjects.Except(model.SelectedRequiredSubjects).ToList();
+
+            if (addedRequiredSubjects.Any() || removedRequiredSubjects.Any())
+            {
+                var addedSubjectsNames = await _context.Subjects
+                    .Where(s => addedRequiredSubjects.Contains(s.Id))
+                    .Select(s => s.Name)
+                    .ToListAsync();
+
+                var removedSubjectsNames = await _context.Subjects
+                    .Where(s => removedRequiredSubjects.Contains(s.Id))
+                    .Select(s => s.Name)
+                    .ToListAsync();
+
+                if (addedSubjectsNames.Any())
+                {
+                    changes.Add(new Change
+                    {
+                        Field = "Required Subjects Added",
+                        OldValue = string.Empty,
+                        NewValue = string.Join(", ", addedSubjectsNames)
+                    });
+                }
+
+                if (removedSubjectsNames.Any())
+                {
+                    changes.Add(new Change
+                    {
+                        Field = "Required Subjects Removed",
+                        OldValue = string.Join(", ", removedSubjectsNames),
+                        NewValue = string.Empty
+                    });
+                }
+            }
+
+            // Track changes in alternative subjects
+            var originalAlternativeSubjects = course.AlternativeSubjects.Select(asub => asub.SubjectId).ToList();
+            var addedAlternativeSubjects = model.SelectedAlternativeSubjects.Except(originalAlternativeSubjects).ToList();
+            var removedAlternativeSubjects = originalAlternativeSubjects.Except(model.SelectedAlternativeSubjects).ToList();
+
+            if (addedAlternativeSubjects.Any() || removedAlternativeSubjects.Any())
+            {
+                var addedSubjectsNames = await _context.Subjects
+                    .Where(s => addedAlternativeSubjects.Contains(s.Id))
+                    .Select(s => s.Name)
+                    .ToListAsync();
+
+                var removedSubjectsNames = await _context.Subjects
+                    .Where(s => removedAlternativeSubjects.Contains(s.Id))
+                    .Select(s => s.Name)
+                    .ToListAsync();
+
+                if (addedSubjectsNames.Any())
+                {
+                    changes.Add(new Change
+                    {
+                        Field = "Alternative Subjects Added",
+                        OldValue = string.Empty,
+                        NewValue = string.Join(", ", addedSubjectsNames)
+                    });
+                }
+
+                if (removedSubjectsNames.Any())
+                {
+                    changes.Add(new Change
+                    {
+                        Field = "Alternative Subjects Removed",
+                        OldValue = string.Join(", ", removedSubjectsNames),
+                        NewValue = string.Empty
+                    });
+                }
+            }
+
+            // Update required subjects and alternative subjects
+            await UpdateRequiredSubjects(model, course.CourseId);
+            await UpdateAlternativeSubjects(model, course.CourseId);
+
+            _context.Update(course);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Course '{course.CourseName}' updated successfully.");
+
+            TempData["SuccessMessage"] = "Update Successful!";
+            TempData["Changes"] = JsonConvert.SerializeObject(changes); // Serialize the list to JSON
+
+            return RedirectToAction(nameof(EditSuccess));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while updating the course.");
+            ModelState.AddModelError("", "An error occurred while updating the course. Please try again.");
+            await PopulateViewModel(model);
+            return View(model);
+        }
+    }
+
+
+    private async Task UpdateRequiredSubjects(CourseViewModel model, int courseId)
+    {
+        var existingSubjects = _context.SubjectRequireds.Where(sr => sr.CourseId == courseId).ToList();
+        var selectedSubjectIds = model.SelectedRequiredSubjects;
+
+        // Add new required subjects that aren't already linked
+        foreach (var subjectId in selectedSubjectIds)
+        {
+            if (!existingSubjects.Any(sr => sr.SubjectId == subjectId))
+            {
+                var subjectLevel = model.RequiredSubjectLevels.TryGetValue(subjectId, out int level) ? level : 1;
+                _context.SubjectRequireds.Add(new SubjectRequired { CourseId = courseId, SubjectId = subjectId, SubjectLevel = subjectLevel });
+            }
+            else
+            {
+                // Update existing subject level
+                var existingSubject = existingSubjects.FirstOrDefault(sr => sr.SubjectId == subjectId);
+                if (existingSubject != null && model.RequiredSubjectLevels.TryGetValue(subjectId, out int level))
+                {
+                    existingSubject.SubjectLevel = level;
+                }
+            }
+        }
+
+        // Remove existing links that are not in the newly selected subjects
+        _context.SubjectRequireds.RemoveRange(existingSubjects.Where(sr => !selectedSubjectIds.Contains(sr.SubjectId)));
+
         await _context.SaveChangesAsync();
+    }
 
-        TempData["SuccessMessage"] = "Update Successful!";
-        TempData["Changes"] = changes; // Storing changes in TempData
+    private async Task UpdateAlternativeSubjects(CourseViewModel model, int courseId)
+    {
+        var existingAlternatives = _context.AlternativeSubjects.Where(a => a.CourseId == courseId).ToList();
 
-        return RedirectToAction(nameof(EditSuccess)); // Redirect to a confirmation page
+        foreach (var subjectId in model.SelectedAlternativeSubjects)
+        {
+            var alternativeSubject = existingAlternatives.FirstOrDefault(a => a.SubjectId == subjectId);
+
+            if (alternativeSubject == null)
+            {
+                // Subject not linked yet, add new
+                var subjectName = _context.Subjects.FirstOrDefault(s => s.Id == subjectId)?.Name ?? "Unknown";
+                var subjectLevel = model.AlternativeSubjectLevels.TryGetValue(subjectId, out int level) ? level : 1;
+
+                _context.AlternativeSubjects.Add(new AlternativeSubject
+                {
+                    CourseId = courseId,
+                    SubjectId = subjectId,
+                    AlternativeSubjectLevel = subjectLevel,
+                    AlternativeSubjectName = subjectName
+                });
+            }
+            else
+            {
+                // Update existing subject
+                if (model.AlternativeSubjectLevels.TryGetValue(subjectId, out int level))
+                {
+                    alternativeSubject.AlternativeSubjectLevel = level;
+                }
+            }
+        }
+
+        // Remove unselected subjects
+        _context.AlternativeSubjects.RemoveRange(existingAlternatives.Where(a => !model.SelectedAlternativeSubjects.Contains(a.SubjectId)));
+
+        await _context.SaveChangesAsync();
     }
 
     public IActionResult EditSuccess()
@@ -330,67 +523,6 @@ public class AdminController : Controller
             Description = $"Level {l}"
         }).ToList();
     }
-
-    private async Task UpdateRequiredSubjects(CourseViewModel model, int courseId)
-    {
-        // Fetch existing required subjects linked to this course
-        var existingSubjects = _context.SubjectRequireds.Where(sr => sr.CourseId == courseId).ToList();
-        var selectedSubjectIds = model.SelectedRequiredSubjects;
-
-        // Add new required subjects that aren't already linked
-        foreach (var subjectId in selectedSubjectIds)
-        {
-            if (!existingSubjects.Any(sr => sr.SubjectId == subjectId))
-            {
-                _context.SubjectRequireds.Add(new SubjectRequired { CourseId = courseId, SubjectId = subjectId });
-            }
-        }
-
-        // Remove existing links that are not in the newly selected subjects
-        _context.SubjectRequireds.RemoveRange(existingSubjects.Where(sr => !selectedSubjectIds.Contains(sr.SubjectId)));
-
-        await _context.SaveChangesAsync();
-    }
-
-    private async Task UpdateAlternativeSubjects(CourseViewModel model, int courseId)
-    {
-        var existingAlternatives = _context.AlternativeSubjects.Where(a => a.CourseId == courseId).ToList();
-
-        foreach (var subjectId in model.SelectedAlternativeSubjects)
-        {
-            var alternativeSubject = existingAlternatives.FirstOrDefault(a => a.SubjectId == subjectId);
-
-            if (alternativeSubject == null)
-            {
-                // Subject not linked yet, add new
-                var subjectName = _context.Subjects.FirstOrDefault(s => s.Id == subjectId)?.Name ?? "Unknown";
-                var subjectLevel = model.AlternativeSubjectLevels.ContainsKey(subjectId) ? model.AlternativeSubjectLevels[subjectId] : defaultLevel; // Use a default level or handle accordingly
-
-                _context.AlternativeSubjects.Add(new AlternativeSubject
-                {
-                    CourseId = courseId,
-                    SubjectId = subjectId,
-                    AlternativeSubjectLevel = subjectLevel,
-                    AlternativeSubjectName = subjectName
-                });
-            }
-            else
-            {
-                // Update existing subject
-                if (model.AlternativeSubjectLevels.ContainsKey(subjectId))
-                {
-                    alternativeSubject.AlternativeSubjectLevel = model.AlternativeSubjectLevels[subjectId];
-                }
-            }
-        }
-
-        // Remove unselected subjects
-        _context.AlternativeSubjects.RemoveRange(existingAlternatives.Where(a => !model.SelectedAlternativeSubjects.Contains(a.SubjectId)));
-
-        await _context.SaveChangesAsync();
-    }
-
-
 
     // GET: /Admin/DeleteCourse/5
     public async Task<IActionResult> DeleteCourse(int? id)

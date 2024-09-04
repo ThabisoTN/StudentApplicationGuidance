@@ -1,26 +1,55 @@
-﻿@{
-    Layout = "_Layout";
+﻿@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Edit Success";
 }
 
-<div class="alert alert-success">
-    <strong>Success!</strong> @TempData["SuccessMessage"]
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="card-title">Course Updated Successfully</h2>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">@TempData["SuccessMessage"]</p>
+
+                    @if (TempData["Changes"] != null)
+                    {
+                        var changes = JsonConvert.DeserializeObject<List<StudentApplicationGuidance.Models.Change>>(TempData["Changes"].ToString());
+
+                        <h3 class="mt-4">Changes Made:</h3>
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Original Value</th>
+                                    <th>Updated Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var change in changes)
+                                {
+                                    <tr>
+                                        <td>@change.Field</td>
+                                        <td>@change.OldValue</td>
+                                        <td>@change.NewValue</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="row justify-content-between">
+                        <div class="col-auto">
+                            <a href="@Url.Action("Courses", "Admin")" class="btn btn-secondary">Back to Course List</a>
+                        </div>
+                        <div class="col-auto">
+                            <a href="@Url.Action("EditCourse", "Admin", new { id = TempData["CourseId"] })" class="btn btn-primary">Continue Editing</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-@if (TempData["Changes"] is List<string> changes && changes.Any())
-{
-    <div>
-        <h4>Changes Applied:</h4>
-        <ul>
-            @foreach (var change in changes)
-            {
-                <li>@change</li>
-            }
-        </ul>
-    </div>
-}
-else
-{
-    <div>
-        <h4>No changes were made.</h4>
-    </div>
-}

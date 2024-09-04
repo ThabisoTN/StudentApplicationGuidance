@@ -29,58 +29,95 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <div>
-            <h4>Required Subjects</h4>
-            @foreach (var subject in Model.AllSubjects)
-            {
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="SelectedRequiredSubjects"
-                           value="@subject.Value" id="required-@subject.Value"
-                    @(Model.SelectedRequiredSubjects.Contains(int.Parse(subject.Value)) ? "checked" : "")>
-                    <label class="form-check-label" for="required-@subject.Value">@subject.Text</label>
-                </div>
-            }
+        <div class="form-group">
+            <label asp-for="NumberOfRequiredAlternativeSubjects" class="control-label text-primary">Number of Required Alternative Subjects</label>
+            <input asp-for="NumberOfRequiredAlternativeSubjects" class="form-control border-primary" />
+            <span asp-validation-for="NumberOfRequiredAlternativeSubjects" class="text-danger"></span>
         </div>
 
-        <div>
-            <h4>Alternative Subjects</h4>
-            @foreach (var subject in Model.AllSubjects)
-            {
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="SelectedAlternativeSubjects"
-                           value="@subject.Value" id="alternative-@subject.Value"
-                    @(Model.SelectedAlternativeSubjects.Contains(int.Parse(subject.Value)) ? "checked" : "")>
-                    <label class="form-check-label" for="alternative-@subject.Value">@subject.Text</label>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label text-success">Required Subjects</label>
+                    <div class="required-subjects">
+                        @foreach (var subject in Model.AllSubjects)
+                        {
+                            <div class="subject-item">
+                                <div class="form-check">
+                                    <input type="checkbox" name="SelectedRequiredSubjects" value="@subject.Value" class="form-check-input" id="required-@subject.Value"
+                                           @(Model.SelectedRequiredSubjects.Contains(int.Parse(subject.Value)) ? "checked" : "") />
+                                    <label class="form-check-label" for="required-@subject.Value">@subject.Text</label>
+                                </div>
+                                <select name="RequiredSubjectLevels[@subject.Value]" class="form-control level-options border-success">
+                                    @foreach (var level in Model.LevelOptions)
+                                    {
+                                        <option value="@level.Level" selected="@(Model.RequiredSubjectLevels.ContainsKey(int.Parse(subject.Value)) && Model.RequiredSubjectLevels[int.Parse(subject.Value)] == level.Level ? "selected" : null)">@level.Description</option>
+
+                                    }
+                                </select>
+                            </div>
+                        }
+                    </div>
                 </div>
-            }
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label text-info">Alternative Subjects</label>
+                    <div class="alternative-subjects">
+                        @foreach (var subject in Model.AllSubjects)
+                        {
+                            <div class="subject-item">
+                                <div class="form-check">
+                                    <input type="checkbox" name="SelectedAlternativeSubjects" value="@subject.Value" class="form-check-input" id="alternative-@subject.Value"
+                                           @(Model.SelectedAlternativeSubjects.Contains(int.Parse(subject.Value)) ? "checked" : "") />
+                                    <label class="form-check-label" for="alternative-@subject.Value">@subject.Text</label>
+                                </div>
+                                <select name="AlternativeSubjectLevels[@subject.Value]" class="form-control level-options border-info">
+                                    @foreach (var level in Model.LevelOptions)
+                                    {
+                                        <option value="@level.Level" selected="@(Model.AlternativeSubjectLevels.ContainsKey(int.Parse(subject.Value)) && Model.AlternativeSubjectLevels[int.Parse(subject.Value)] == level.Level ? "selected" : null)">@level.Description</option>
+
+                                    }
+                                </select>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Save</button>
     </form>
 </main>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">
-        <strong>Success!</strong> @TempData["SuccessMessage"]
-    </div>
-}
+<style>
+    .required-subjects, .alternative-subjects {
+        margin-bottom: 15px;
+    }
 
-@if (TempData["Changes"] is List<string> changes && changes.Any())
-{
-    <div>
-        <h4>Changes Applied:</h4>
-        <ul>
-            @foreach (var change in changes)
-            {
-                <li>@change</li>
-            }
-        </ul>
-    </div>
-}
-else
-{
-    <div>
-        <h4>No changes were made.</h4>
-    </div>
-}
+    .subject-item {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+        .subject-item .form-check {
+            flex: 1;
+        }
+
+        .subject-item .level-options {
+            max-width: 150px;
+            margin-left: 10px;
+        }
+
+    .form-check-input:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .form-check-label {
+        margin-left: 0.5rem;
+    }
+</style>

@@ -5,31 +5,66 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Courses</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Courses</h3>
+                    <div class="card-tools">
+                        <a asp-action="CreateCourse" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Create New Course
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="coursesTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Description</th>
+                                <th>University</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.CourseName</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.University.UniversityName</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a asp-action="EditCourse" asp-route-id="@item.CourseId" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="DeleteCourse" asp-route-id="@item.CourseId" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Course Name</th>
-            <th>Description</th>
-            <th>University</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.CourseName</td>
-                <td>@item.Description</td>
-                <td>@item.University.UniversityName</td>
-                <td>
-                    <a asp-action="EditCourse" asp-route-id="@item.CourseId" class="btn btn-warning">Edit</a>
-                    <a asp-action="DeleteCourse" asp-route-id="@item.CourseId" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@section Scripts {
+    <script>
+        $(function () {
+            $("#coursesTable").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+                "lengthChange": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#coursesTable_wrapper .col-md-6:eq(0)');
 
-<a asp-action="CreateCourse" class="btn btn-primary">Create New Course</a>
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

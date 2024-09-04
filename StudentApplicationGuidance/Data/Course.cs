@@ -13,6 +13,7 @@ namespace StudentApplicationGuidance.Models
         public int Points { get; set; }
         [StringLength(500)]
         public string? Description { get; set; }
+        public int NumberOfRequiredAlternativeSubjects { get; set; }
 
 
         public virtual ICollection<SubjectRequired> SubjectRequired { get; set; } = new List<SubjectRequired>();

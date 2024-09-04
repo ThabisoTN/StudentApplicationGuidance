@@ -1,36 +1,70 @@
-﻿@model IEnumerable<StudentApplicationGuidance.Data.Subject>
+﻿@model IEnumerable<StudentApplicationGuidance.Models.Course>
 
 @{
-    ViewData["Title"] = "ViewSubjects";
+    ViewData["Title"] = "Courses";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Subjects</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Courses</h3>
+                    <div class="card-tools">
+                        <a asp-action="CreateCourse" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Create New Course
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="coursesTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Description</th>
+                                <th>University</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.CourseName</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.University.UniversityName</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a asp-action="EditCourse" asp-route-id="@item.CourseId" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="DeleteCourse" asp-route-id="@item.CourseId" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Add New Subject</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@section Scripts {
+    <script>
+        $(function () {
+            $("#coursesTable").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+                "lengthChange": true,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#coursesTable_wrapper .col-md-6:eq(0)');
+
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 }
-    </tbody>
-</table>
