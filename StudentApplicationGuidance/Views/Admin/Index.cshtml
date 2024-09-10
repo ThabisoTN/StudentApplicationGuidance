@@ -1,4 +1,8 @@
-﻿@{
+﻿@model StudentApplicationGuidance.ModelView.DashboardViewModel
+@using System.Text.Json
+
+
+@{
     ViewData["Title"] = "Dashboard";
 }
 
@@ -10,16 +14,101 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-   
-
     <div class="container mt-4">
-        <h1>Welcome to the Dashboard</h1>
-        <p>This is the dashboard where you can manage and view different aspects of the application.</p>
+        <h1 class="mb-4">Welcome to the Dashboard</h1>
+        <p class="lead mb-5">This is the dashboard where you can manage and view different aspects of the application.</p>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Users</h5>
+                        <p class="card-text display-4">@Model.UserCount</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Courses</h5>
+                        <p class="card-text display-4">@Model.CourseCount</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Users by Province</h5>
+                        <canvas id="usersByProvinceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Courses by University</h5>
+                        <canvas id="coursesByUniversityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="~/js/jquery.min.js"></script>
     <script src="~/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var usersByProvinceData = @Html.Raw(JsonSerializer.Serialize(Model.UsersByProvince));
+        var coursesByUniversityData = @Html.Raw(JsonSerializer.Serialize(Model.CoursesByUniversity));
+
+        console.log(usersByProvinceData); // Check if data is correct
+        console.log(coursesByUniversityData); // Check if data is correct
+
+        new Chart(document.getElementById('usersByProvinceChart'), {
+            type: 'bar',
+            data: {
+                labels: usersByProvinceData.map(d => d.Province),
+                datasets: [{
+                    label: 'Users by Province',
+                    data: usersByProvinceData.map(d => d.Count),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('coursesByUniversityChart'), {
+            type: 'bar',
+            data: {
+                labels: coursesByUniversityData.map(d => d.University),
+                datasets: [{
+                    label: 'Courses by University',
+                    data: coursesByUniversityData.map(d => d.Count),
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+    </script>
 </body>
 </html>

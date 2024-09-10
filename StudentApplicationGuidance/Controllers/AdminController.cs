@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using StudentApplicationGuidance.ModelView;
 
 public class AdminController : Controller
 {
@@ -27,10 +28,48 @@ public class AdminController : Controller
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        try
+        {
+            var userCount = await _context.Users.CountAsync();
+            var courseCount = await _context.Courses.CountAsync();
+            var coursesByUniversity = await _context.Courses
+                .GroupBy(c => c.University.UniversityName)
+                .Select(g => new { University = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var usersByProvince = await _context.Users
+                .GroupBy(u => u.Province.Name)
+                .Select(g => new { Province = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // Log or debug to check data
+            _logger.LogInformation($"User Count: {userCount}");
+            _logger.LogInformation($"Course Count: {courseCount}");
+            _logger.LogInformation($"Courses by University: {JsonConvert.SerializeObject(coursesByUniversity)}");
+            _logger.LogInformation($"Users by Province: {JsonConvert.SerializeObject(usersByProvince)}");
+
+            var viewModel = new DashboardViewModel
+            {
+                UserCount = userCount,
+                CourseCount = courseCount,
+                CoursesByUniversity = coursesByUniversity.Cast<object>().ToList(),
+                UsersByProvince = usersByProvince.Cast<object>().ToList()
+            };
+
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching dashboard data");
+            return View("Error");
+        }
     }
+
+
+
+
 
     // GET: /Admin/ViewSubjects
     public async Task<IActionResult> ViewSubjects()
@@ -68,7 +107,7 @@ public class AdminController : Controller
         try
         {
             var courses = await _context.Courses.Include(c => c.University).ToListAsync();
-            return View(courses);
+            return View(courses); // Ensure this is a list of Course objects
         }
         catch (Exception ex)
         {
