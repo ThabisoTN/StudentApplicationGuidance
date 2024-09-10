@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StudentApplicationGuidance.Models
+
 {
     public class Course
     {
