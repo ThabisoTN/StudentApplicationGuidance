@@ -2,11 +2,133 @@
     ViewData["Title"] = "Home Page";
 }
 
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
+        color: #4A4A4A;
+    }
+
+    .home-container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .hero {
+        text-align: center;
+        background: linear-gradient(to right, #007bff, #6cb2eb);
+        color: white;
+        padding: 80px 20px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        padding: 15px 35px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838;
+    }
+
+    .btn-secondary {
+        background-color: #17a2b8;
+    }
+
+    .btn-secondary:hover {
+        background-color: #138496;
+    }
+
+    .features {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .features h2 {
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        color: #343a40;
+    }
+
+    .row {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .feature-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        margin: 10px;
+        width: 280px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-card h3 {
+        color: #007bff;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+
+    .feature-card p {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
+    .cta {
+        text-align: center;
+        margin-top: 50px;
+        padding: 40px 20px;
+        background-color: #e7f5ff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta h2 {
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: #343a40;
+    }
+
+</style>
+
 <div class="home-container">
     <section class="hero">
         <h1>Welcome to Student Application Guidance</h1>
         <p>Your path to academic success starts here.</p>
-        <a href="@Url.Action("ViewSubjects", "UserSubjects")" class="btn btn-primary btn-lg">Get Started</a>
+        <a href="@Url.Action("ViewSubjects", "UserSubjects")" class="btn btn-primary">Get Started</a>
     </section>
 
     <section class="features">
@@ -35,6 +157,6 @@
 
     <section class="cta">
         <h2>Ready to find your perfect course?</h2>
-        <a href="@Url.Action("Index", "Courses")" class="btn btn-secondary btn-lg">View Courses</a>
+        <a href="@Url.Action("Index", "Courses")" class="btn btn-secondary">View Courses</a>
     </section>
 </div>
